@@ -66,7 +66,6 @@ export default tsEslint.config(
       "require-atomic-updates": "error",
       "use-isnan": "error",
       "accessor-pairs": "error",
-      // "consistent-return": "error", For some reason is not working with TS
       "grouped-accessor-pairs": "error",
       "logical-assignment-operators": "warn",
       "no-array-constructor": "error",
@@ -132,6 +131,9 @@ export default tsEslint.config(
         },
       ],
       // #endregion Eslint
+      // #region ImportLint
+      // TODO
+      // #endregion ImportLint
       // #region TSLint
       "@typescript-eslint/adjacent-overload-signatures": "error",
       "@typescript-eslint/await-thenable": "error",
