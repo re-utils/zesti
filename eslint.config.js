@@ -8,7 +8,7 @@ export default tsEslint.config(
     ignores: ["**/*.js", "**/*.d.ts", "lib/**/*", "node_modules/**/*"],
   },
   {
-    files: ["src/**/*.ts"],
+    files: ["**/*.ts"],
     plugins: {
       "@typescript-eslint": tsEslint.plugin,
       "@stylistic": stylistic,
