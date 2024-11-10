@@ -3,12 +3,12 @@
     // Enable latest features
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "target": "ESNext",
-    "module": "NodeNext",
+    "module": "ESNext",
     "moduleDetection": "force",
     "resolveJsonModule": true,
     "isolatedModules": true,
     // Bundler mode
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Bundler",
     "verbatimModuleSyntax": true,
     // Best practices
     "strict": true,
@@ -21,12 +21,8 @@
     "noImplicitThis": true,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
-    "isolatedDeclarations": true,
-    // Output
+    // Declaration options
     "declaration": true,
-    "declarationDir": "lib",
-    "emitDeclarationOnly": true,
-    "stripInternal": true,
-    "extendedDiagnostics": true
+    "isolatedDeclarations": true
   }
 }
