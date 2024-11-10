@@ -15,13 +15,14 @@
     "lint:fix": "eslint ./src --fix"
   },
   "devDependencies": {
+    "@stacksjs/dtsx": "latest",
     "@stylistic/eslint-plugin": "latest",
-    "eslint": "latest",
-    "typescript-eslint": "latest",
-    "eslint-plugin-jsdoc": "latest",
     "@types/bun": "latest",
+    "eslint": "latest",
+    "eslint-plugin-jsdoc": "latest",
     "mitata": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "typescript-eslint": "latest"
   },
   "dependencies": {}
 }
