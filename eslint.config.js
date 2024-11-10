@@ -118,7 +118,6 @@ export default tsEslint.config(
           null: "ignore",
         },
       ],
-      "func-style": ["error", "declaration"],
       "no-empty": [
         "error",
         {
