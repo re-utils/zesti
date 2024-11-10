@@ -1,6 +1,6 @@
 /// <reference types='bun-types' />
 import { existsSync, rmSync } from 'node:fs';
-import { generate } from '@stacksjs/dtsx/generate.js';
+import { generate } from '@stacksjs/dtsx';
 
 // Constants
 const SOURCEDIR = './src';
