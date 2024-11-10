@@ -21,13 +21,12 @@
     "noImplicitThis": true,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
+    "isolatedDeclarations": true,
     // Output
     "declaration": true,
     "declarationDir": "lib",
     "emitDeclarationOnly": true,
-    "isolatedDeclarations": true,
     "stripInternal": true,
     "extendedDiagnostics": true
-  },
-  "include": ["src"]
+  }
 }
