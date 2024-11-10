@@ -300,12 +300,6 @@ export default tsEslint.config(
           allowSingleExtends: true,
         },
       ],
-      "@typescript-eslint/no-floating-promises": [
-        "error",
-        {
-          ignoreIIFE: true,
-        },
-      ],
       "@typescript-eslint/no-inferrable-types": [
         "warn",
         {
