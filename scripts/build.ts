@@ -1,12 +1,14 @@
 /// <reference types='bun-types' />
 import { existsSync, rmSync } from 'node:fs';
+import { resolve } from 'node:path/posix';
 
 import { transpileDeclaration } from 'typescript';
 import tsconfig from '../tsconfig.json';
 
 // Constants
-const SOURCEDIR = './src';
-const OUTDIR = 'lib';
+const ROOTDIR = resolve(import.meta.dir, '..');
+const SOURCEDIR = `${ROOTDIR}/src`;
+const OUTDIR = `${ROOTDIR}/lib`;
 
 // Remove old content
 if (existsSync(OUTDIR)) rmSync(OUTDIR, { recursive: true });
