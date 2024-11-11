@@ -1,6 +1,8 @@
 /// <reference types='bun-types' />
 import { existsSync, rmSync } from 'node:fs';
-import { generate } from '@stacksjs/dtsx';
+
+import { transpileDeclaration } from 'typescript';
+import tsconfig from '../tsconfig.json';
 
 // Constants
 const SOURCEDIR = './src';
@@ -8,14 +10,6 @@ const OUTDIR = 'lib';
 
 // Remove old content
 if (existsSync(OUTDIR)) rmSync(OUTDIR, { recursive: true });
-
-generate({
-  root: SOURCEDIR, // default: './src'
-  entrypoints: ['**/*'],
-  outdir: OUTDIR,
-  clean: true,
-  verbose: true
-});
 
 // Transpile files concurrently
 const transpiler = new Bun.Transpiler({
@@ -28,13 +22,20 @@ const transpiler = new Bun.Transpiler({
 });
 
 for (const path of new Bun.Glob('**/*.ts').scanSync(SOURCEDIR)) {
-  Bun.file(`${SOURCEDIR}/${path}`)
-    .arrayBuffer()
-    .then(async (buf) => transpiler.transform(buf)
-      .then((res) => {
-        if (res.length !== 0) {
-          const pathExtStart = path.lastIndexOf('.');
-          Bun.write(`${OUTDIR}/${`${path.substring(0, pathExtStart === -1 ? path.length : pathExtStart)}.js`}`, res);
-        }
-      }));
+  const srcPath = `${SOURCEDIR}/${path}`;
+
+  const pathExtStart = path.lastIndexOf('.');
+  const outPathNoExt = `${OUTDIR}/${path.substring(0, pathExtStart >>> 0)}`;
+
+  Bun.file(srcPath)
+    .text()
+    .then((buf) => {
+      transpiler.transform(buf)
+        .then((res) => {
+          if (res.length !== 0)
+            Bun.write(`${outPathNoExt}.js`, res.replace(/const/g, 'let'));
+        });
+
+      Bun.write(`${outPathNoExt}.d.ts`, transpileDeclaration(buf, tsconfig as any).outputText);
+    });
 }
