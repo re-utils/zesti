@@ -15,7 +15,6 @@
     "lint:fix": "eslint ./src --fix"
   },
   "devDependencies": {
-    "@stacksjs/dtsx": "latest",
     "@stylistic/eslint-plugin": "latest",
     "@types/bun": "latest",
     "eslint": "latest",
