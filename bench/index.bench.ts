@@ -1,9 +1,5 @@
 import { summary, run, bench } from 'mitata';
 
-// Warmup (de-optimize `bench()` calls)
-bench('noop', () => { });
-bench('noop2', () => { });
-
 // Example benchmark
 summary(() => {
   bench('Date.now()', () => Date.now());
