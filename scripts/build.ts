@@ -35,7 +35,7 @@ for (const path of new Bun.Glob('**/*.ts').scanSync(SOURCEDIR)) {
       transpiler.transform(buf)
         .then((res) => {
           if (res.length !== 0)
-            Bun.write(`${outPathNoExt}.js`, res.replace(/const/g, 'let'));
+            Bun.write(`${outPathNoExt}.js`, res.replace(/const /g, 'let '));
         });
 
       Bun.write(`${outPathNoExt}.d.ts`, transpileDeclaration(buf, tsconfig as any).outputText);
