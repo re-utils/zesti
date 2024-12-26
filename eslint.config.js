@@ -375,7 +375,6 @@ export default tsEslint.config(
       "@stylistic/key-spacing": "warn",
       "@stylistic/linebreak-style": "warn",
       "@stylistic/new-parens": "warn",
-      "@stylistic/no-confusing-arrow": "warn",
       "@stylistic/no-extra-parens": "warn",
       "@stylistic/no-extra-semi": "warn",
       "@stylistic/no-floating-decimal": "warn",
