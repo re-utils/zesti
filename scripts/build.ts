@@ -8,7 +8,7 @@ import tsconfig from '../tsconfig.json';
 // Constants
 const ROOTDIR = resolve(import.meta.dir, '..');
 const SOURCEDIR = `${ROOTDIR}/src`;
-const OUTDIR = `${ROOTDIR}/lib`;
+const OUTDIR = join(ROOTDIR, tsconfig.compilerOptions.declarationDir);
 
 // Remove old content
 if (existsSync(OUTDIR)) rmSync(OUTDIR, { recursive: true });
