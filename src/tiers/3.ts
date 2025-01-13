@@ -137,15 +137,15 @@ const build = (router: AnyRouter, errList: [err: number, handler: AnyHandler][],
   // Build subrouters
   for (let i = 0, x: [string, AnyRouter]; i < router.s.length; i++) {
     x = router.s[i];
-    if (x[0].includes('*'))
-      throw new Error('Subrouter path cannot be dynamic');
-
     build(x[1], errList, routes, mds, x[0] === '/'
       ? prefix
       : prefix + x[0], isScopeAsync);
   }
 };
 
+/**
+ * Build to the fastest the handler
+ */
 export default (router: AnyRouter): (req: Request) => Response | Promise<Response> => {
   const routes: RouteTree = [ {}, null];
   build(router, [], routes, [], '', false);

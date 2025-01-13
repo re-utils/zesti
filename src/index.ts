@@ -158,7 +158,9 @@ const registers: Router = {
     return this;
   },
 
-  route(this: AnyRouter, ...args: [any, any]) {
+  route(this: AnyRouter, ...args: [string, any]) {
+    if (args[0].includes('*'))
+      throw new Error('Subrouter path cannot be dynamic');
     this.s.push(args as never);
     return this;
   }
