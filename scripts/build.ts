@@ -1,6 +1,6 @@
 /// <reference types='bun-types' />
 import { existsSync, rmSync } from 'node:fs';
-import { resolve } from 'node:path/posix';
+import { resolve, join } from 'node:path/posix';
 
 import { transpileDeclaration } from 'typescript';
 import tsconfig from '../tsconfig.json';
@@ -15,7 +15,7 @@ if (existsSync(OUTDIR)) rmSync(OUTDIR, { recursive: true });
 
 // Transpile files concurrently
 const transpiler = new Bun.Transpiler({
-  loader: 'tsx',
+  loader: 'ts',
   target: 'node',
 
   // Lighter output

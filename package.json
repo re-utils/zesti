@@ -1,7 +1,7 @@
 {
-  "name": "example",
+  "name": "fleek",
   "version": "0.0.1",
-  "description": "Example package",
+  "description": "A small and fast edge framework",
   "keywords": [],
   "license": "MIT",
   "type": "module",
@@ -15,14 +15,18 @@
     "lint:fix": "eslint ./src --fix"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
     "@stylistic/eslint-plugin": "latest",
-    "@types/bun": "latest",
+    "@types/bun": "^1.1.16",
+    "@types/deno": "^2.0.0",
     "eslint": "latest",
     "eslint-plugin-jsdoc": "latest",
     "mitata": "latest",
-    "typescript": "latest",
     "tsx": "latest",
+    "typescript": "latest",
     "typescript-eslint": "latest"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@mapl/router": "^0.3.2"
+  }
 }
