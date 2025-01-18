@@ -23,11 +23,11 @@ export default (handler: AnyHandler, hasParam: boolean): (...c: any[]) => any =>
     case 'buffer':
       return isScopeAsync
         ? hasParam
-          ? async (p: any, c: any, ...a: any[]) => new Response(await fn(p, c, ...a), c)
-          : async (c: any, ...a: any[]) => new Response(await fn(c, ...a), c)
+          ? async (p: any, c: any) => new Response(await fn(p, c), c)
+          : async (c: any) => new Response(await fn(c), c)
         : hasParam
-          ? (p: any, c: any, ...a: any[]) => new Response(fn(p, c, ...a), c)
-          : (c: any, ...a: any[]) => new Response(fn(c, ...a), c);
+          ? (p: any, c: any) => new Response(fn(p, c), c)
+          : (c: any) => new Response(fn(c), c);
 
     case 'plain':
       return fn;
@@ -35,64 +35,64 @@ export default (handler: AnyHandler, hasParam: boolean): (...c: any[]) => any =>
     case 'text':
       return isScopeAsync
         ? hasParam
-          ? async (p: any, c: Context, ...a: any[]) => {
+          ? async (p: any, c: Context) => {
             c.headers.push(text);
-            return new Response(await fn(p, c, ...a), c as any);
+            return new Response(await fn(p, c), c as any);
           }
-          : async (c: Context, ...a: any[]) => {
+          : async (c: Context) => {
             c.headers.push(text);
-            return new Response(await fn(c, ...a), c as any);
+            return new Response(await fn(c), c as any);
           }
         : hasParam
-          ? (p: any, c: Context, ...a: any[]) => {
+          ? (p: any, c: Context) => {
             c.headers.push(text);
-            return new Response(fn(p, c, ...a), c as any);
+            return new Response(fn(p, c), c as any);
           }
-          : (c: Context, ...a: any[]) => {
+          : (c: Context) => {
             c.headers.push(text);
-            return new Response(fn(c, ...a), c as any);
+            return new Response(fn(c), c as any);
           };
 
     case 'html':
       return isScopeAsync
         ? hasParam
-          ? async (p: any, c: Context, ...a: any[]) => {
+          ? async (p: any, c: Context) => {
             c.headers.push(html);
-            return new Response(await fn(p, c, ...a), c as any);
+            return new Response(await fn(p, c), c as any);
           }
-          : async (c: Context, ...a: any[]) => {
+          : async (c: Context) => {
             c.headers.push(html);
-            return new Response(await fn(c, ...a), c as any);
+            return new Response(await fn(c), c as any);
           }
         : hasParam
-          ? (p: any, c: Context, ...a: any[]) => {
+          ? (p: any, c: Context) => {
             c.headers.push(html);
-            return new Response(fn(p, c, ...a), c as any);
+            return new Response(fn(p, c), c as any);
           }
-          : (c: Context, ...a: any[]) => {
+          : (c: Context) => {
             c.headers.push(html);
-            return new Response(fn(c, ...a), c as any);
+            return new Response(fn(c), c as any);
           };
 
     case 'json':
       return isScopeAsync
         ? hasParam
-          ? async (p: any, c: Context, ...a: any[]) => {
+          ? async (p: any, c: Context) => {
             c.headers.push(json);
-            return new Response(await fn(p, c, ...a), c as any);
+            return new Response(await fn(p, c), c as any);
           }
-          : async (c: Context, ...a: any[]) => {
+          : async (c: Context) => {
             c.headers.push(json);
-            return new Response(await fn(c, ...a), c as any);
+            return new Response(await fn(c), c as any);
           }
         : hasParam
-          ? (p: any, c: Context, ...a: any[]) => {
+          ? (p: any, c: Context) => {
             c.headers.push(json);
-            return new Response(fn(p, c, ...a), c as any);
+            return new Response(fn(p, c), c as any);
           }
-          : (c: Context, ...a: any[]) => {
+          : (c: Context) => {
             c.headers.push(json);
-            return new Response(fn(c, ...a), c as any);
+            return new Response(fn(c), c as any);
           };
   }
 };

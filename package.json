@@ -1,6 +1,6 @@
 {
   "name": "zesti",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A small and fast edge framework",
   "keywords": [],
   "license": "MIT",
@@ -9,24 +9,26 @@
   "types": "./index.d.ts",
   "scripts": {
     "build:test": "bun scripts/build.ts && bun test",
-    "build:bench": "bun build:test && bun scripts/bench.ts",
+    "bench": "bun scripts/bench.ts",
+    "bench-node": "bun scripts/bench-node.ts",
     "build:publish": "bun build:test && bun scripts/publish.ts",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250109.0",
+    "@mitata/counters": "^0.0.8",
     "@stylistic/eslint-plugin": "latest",
     "@types/bun": "^1.1.16",
     "@types/deno": "^2.0.0",
     "eslint": "latest",
     "eslint-plugin-jsdoc": "latest",
-    "mitata": "latest",
+    "mitata": "^1.0.30",
     "tsx": "latest",
     "typescript": "latest",
     "typescript-eslint": "latest"
   },
   "dependencies": {
-    "@mapl/router": "^0.3.2"
+    "@mapl/router": "^0.3.3"
   }
 }

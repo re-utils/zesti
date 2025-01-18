@@ -4,7 +4,7 @@ import toHandler from './utils/toHandler';
 import type { AnyFn } from '../../types/utils';
 import type { BuildFn } from '../types';
 import type { AnyMiddlewareFn, AnyRouter } from '../..';
-import type { HandlerData } from '../../types/route';
+import type { Context, HandlerData } from '../../types/route';
 import { matcher } from './utils/route';
 
 type RouteTree = [Record<string, BaseRouter<AnyFn>>, BaseRouter<AnyFn> | null];
@@ -29,28 +29,33 @@ const build = (router: AnyRouter, routesTree: RouteTree, cbs: AnyMiddlewareFn[],
       mds.length === 0
         ? f
         : x[3]
-          ? (p: string[], ...a: any[]) => {
+          ? (p: string[], c: Context) => {
             let idx = 0;
             const next = (): any => idx < mdsLen
-              ? mds[idx++](next, ...a as [any])
-              : f(p, ...a);
+              ? mds[idx++](next, c)
+              : f(p, c);
             return next();
           }
-          : (...a: any[]) => {
+          : (c: Context) => {
             let idx = 0;
             const next = (): any => idx < mdsLen
-              ? mds[idx++](next, ...a as [any])
-              : f(...a);
+              ? mds[idx++](next, c)
+              : f(c);
             return next();
           }
     );
+  }
+
+  for (let i = 0, x: [string, AnyRouter], routes = router.s; i < routes.length; i++) {
+    x = routes[i];
+    build(x[1], routesTree, mds, x[0] === '/' ? prefix : prefix + x[0]);
   }
 };
 
 /**
  * Build to the fastest the handler
  */
-export default ((router) => {
+export default ((router, adapter) => {
   const routes: RouteTree = [ {}, null];
   build(router, routes, [], '');
 
@@ -67,14 +72,25 @@ export default ((router) => {
   const routeMap = Object.fromEntries(Object.entries(routes[0])
     .map((pair) => [pair[0], matcher(pair[1], fallback as any)]));
 
-  return (r: Request, ...a: any[]): Response | Promise<Response> => {
+  // No adapter provided
+  if (adapter == null) {
+    return (r) => {
+      const u = r.url;
+      const s = u.indexOf('/', 12) + 1;
+
+      return (routeMap[r.method] ?? fallback)(u.substring(s, u.indexOf('?', s) >>> 0), {
+        headers: [],
+        status: 200,
+        req: r
+      });
+    };
+  }
+
+  // Custom adapter
+  return (r, ...a: any[]) => {
     const u = r.url;
     const s = u.indexOf('/', 12) + 1;
 
-    return (routeMap[r.method] ?? fallback)(u.substring(s, u.indexOf('?', s) >>> 0), {
-      status: 200,
-      req: r,
-      headers: []
-    }, ...a);
+    return (routeMap[r.method] ?? fallback)(u.substring(s, u.indexOf('?', s) >>> 0), adapter(r, ...a as any));
   };
 }) as BuildFn;

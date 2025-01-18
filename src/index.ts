@@ -10,42 +10,38 @@ export type InferParams<Path extends string> = Path extends `${string}*${infer R
 
 export type RouteRegister<
   Method extends string | null,
-  Args extends any[],
   State extends AnyState,
   Routes extends HandlerData[],
   SubRouters extends [string, AnyRouter][]
 > = <
   const Path extends string,
   const T extends (InferParams<Path>['length'] extends 0
-    ? Handler<State, Args>
-    : Handler<State, Args, [InferParams<Path>]>
+    ? Handler<State>
+    : Handler<State, [InferParams<Path>]>
   )
 >(path: Path, handler: T) => Router<
-  Args,
   State,
   [...Routes, [Method, Path, T, InferParams<Path>['length'] extends 0 ? false : true]],
   SubRouters
 >;
 
 export type Router<
-  Args extends any[] = [],
   State extends AnyState = {},
   Routes extends HandlerData[] = [],
   SubRouters extends [string, AnyRouter][] = []
-> = { [Method in Methods]: RouteRegister<Uppercase<Method>, Args, State, Routes, SubRouters> }
+> = { [Method in Methods]: RouteRegister<Uppercase<Method>, State, Routes, SubRouters> }
   & {
     // Weird stuff
-    any: RouteRegister<null, Args, State, Routes, SubRouters>,
+    any: RouteRegister<null, State, Routes, SubRouters>,
 
     // Custom stuff
     insert: <
       const Method extends string,
       const Path extends string,
       const T extends InferParams<Path>['length'] extends 0
-        ? Handler<State, Args>
-        : Handler<State, Args, [InferParams<Path>]>
+        ? Handler<State>
+        : Handler<State, [InferParams<Path>]>
     >(method: Method, path: Path, handler: T) => Router<
-      Args,
       State,
       [...Routes, [Method, Path, T, InferParams<Path>['length'] extends 0 ? false : true]],
       SubRouters
@@ -55,18 +51,18 @@ export type Router<
      * Register a subrouter
      */
     route: <const Path extends string, const SubRouter extends AnyRouter>(path: string, subrouter: SubRouter) => Router<
-      Args, State, Routes, [...SubRouters, [Path, SubRouter]]
+      State, Routes, [...SubRouters, [Path, SubRouter]]
     >,
 
     /**
      * Register a function that validate every request
      */
-    use: (fn: MiddlewareFn<State, Args>) => Router<Args, State, Routes, SubRouters>,
+    use: (fn: MiddlewareFn<State>) => Router<State, Routes, SubRouters>,
 
     /**
      * Add response headers
      */
-    headers: (headers: HeadersInit) => Router<Args, State, Routes, SubRouters>,
+    headers: (headers: HeadersInit) => Router<State, Routes, SubRouters>,
 
     /**
      * All routes
@@ -84,13 +80,13 @@ export type Router<
     m: AnyMiddlewareFn[]
   };
 
-export type AnyRouter = Router<any[], Record<string, any>, any[], any[]>;
 export type AnyState = Record<string, any>;
+export type AnyRouter = Router<AnyState, any[], any[]>;
 
-export type MiddlewareFn<State, AfterArgs extends any[] = []> = (...args: [
-  next: () => MaybePromise<Response>, Context & State, ...AfterArgs
+export type MiddlewareFn<State extends AnyState> = (...args: [
+  next: () => MaybePromise<Response>, Context & State
 ]) => MaybePromise<Response>;
-export type AnyMiddlewareFn = MiddlewareFn<Record<string, any>, any[]>;
+export type AnyMiddlewareFn = MiddlewareFn<AnyState>;
 
 // Implementation
 const initRoute = (method: string | null) => function (this: AnyRouter, path: string, b: any): any {
@@ -121,8 +117,7 @@ const registers: Router = {
         ? headers.entries().toArray()
         : Object.entries(headers);
 
-    // eslint-disable-next-line
-    this.m.push((next, c) => {
+    this.m.push(async (next, c) => {
       c.headers.push(...headerList);
       return next();
     });
