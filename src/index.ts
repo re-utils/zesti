@@ -1,5 +1,5 @@
-import type { DynamicException, ExcludeExceptionType, StaticException } from './except';
-import type { Handler, HandlerData, AnyHandler, Context } from './types/route';
+import type { Handler, HandlerData, Context } from './types/route';
+import type { MaybePromise } from './types/utils';
 
 // Types
 export type Methods = typeof methods[number];
@@ -23,7 +23,7 @@ export type RouteRegister<
 >(path: Path, handler: T) => Router<
   Args,
   State,
-  [...Routes, [Method, Path, T]],
+  [...Routes, [Method, Path, T, InferParams<Path>['length'] extends 0 ? false : true]],
   SubRouters
 >;
 
@@ -38,27 +38,18 @@ export type Router<
     any: RouteRegister<null, Args, State, Routes, SubRouters>,
 
     // Custom stuff
-    insert: <const Method extends string, const Path extends string, const T extends Handler<State, Args>>(method: Method, path: Path, handler: T) => Router<
+    insert: <
+      const Method extends string,
+      const Path extends string,
+      const T extends InferParams<Path>['length'] extends 0
+        ? Handler<State, Args>
+        : Handler<State, Args, [InferParams<Path>]>
+    >(method: Method, path: Path, handler: T) => Router<
       Args,
       State,
-      [...Routes, [Method, Path, T]],
+      [...Routes, [Method, Path, T, InferParams<Path>['length'] extends 0 ? false : true]],
       SubRouters
-    >
-  }
-  & {
-    /**
-     * Handle a static exception
-     */
-    catch: (<const T extends Handler<{}>>(exception: StaticException, handler: T) => Router<
-      Args, State, Routes, SubRouters
-    >) & (<const Payload, const T extends Handler<{}, [Payload]>>(exception: DynamicException<Payload>, handler: T) => Router<
-      Args, State, Routes, SubRouters
-    >),
-
-    /**
-     * Handle all exceptions
-     */
-    catchAll: <const T extends Handler<{}>>(handler: T) => Router<Args, State, Routes, SubRouters>,
+    >,
 
     /**
      * Register a subrouter
@@ -68,16 +59,9 @@ export type Router<
     >,
 
     /**
-     * Register a function to parse and set the result to the context
-     */
-    parse: <const Prop extends string, const ParserReturn>(prop: Prop, fn: (ctx: Context & State) => ParserReturn) => Router<
-      Args, State & Record<Prop, ExcludeExceptionType<Awaited<ParserReturn>>>, Routes, SubRouters
-    >,
-
-    /**
      * Register a function that validate every request
      */
-    validate: (fn: MiddlewareFn<State>) => Router<Args, State, Routes, SubRouters>,
+    use: (fn: MiddlewareFn<State, Args>) => Router<Args, State, Routes, SubRouters>,
 
     /**
      * Add response headers
@@ -88,32 +72,29 @@ export type Router<
      * All routes
      */
     r: Routes,
-    /**
-     * All middlewares
-     */
-    m: MiddlewareData[],
+
     /**
      * All subroutes
      */
     s: SubRouters,
-    // 0 is for all except routes
-    e: [err: number, handler: AnyHandler][]
+
+    /**
+     * All middlewares
+     */
+    m: AnyMiddlewareFn[]
   };
 
-export type AnyRouter = Router<any[], any, any[], any[]>;
+export type AnyRouter = Router<any[], Record<string, any>, any[], any[]>;
 export type AnyState = Record<string, any>;
 
-export type MiddlewareFn<State, Args extends any[] = []> = (...args: [...Args, Context & State]) => unknown;
-export type MiddlewareData =
-  // Parser and validator (require exception validation)
-  | [0, MiddlewareFn<any>, string]
-  | [1, MiddlewareFn<any>, null]
-  // Headers
-  | [2, [string, string][]];
+export type MiddlewareFn<State, AfterArgs extends any[] = []> = (...args: [
+  next: () => MaybePromise<Response>, Context & State, ...AfterArgs
+]) => MaybePromise<Response>;
+export type AnyMiddlewareFn = MiddlewareFn<Record<string, any>, any[]>;
 
 // Implementation
-const initRoute = (method: string | null) => function (this: AnyRouter, a: any, b: any): any {
-  this.r.push([method, a, b]);
+const initRoute = (method: string | null) => function (this: AnyRouter, path: string, b: any): any {
+  this.r.push([method, path, b, path.includes('*')]);
   return this;
 };
 
@@ -122,45 +103,37 @@ const registers: Router = {
   // Load routes
   ...Object.fromEntries(methods.map((m) => [m, initRoute(m.toUpperCase())])),
 
-  // Load middleware
-  parse(this: AnyRouter, prop: string, fn: any) {
-    this.m.push([0, fn, prop]);
+  any: initRoute(null),
+  insert(this: AnyRouter, method: string, path: string, b: any) {
+    this.r.push([method, path, b, path.includes('*')]);
     return this;
   },
 
-  validate(this: AnyRouter, fn: any) {
-    this.m.push([1, fn, null]);
+  use(this: AnyRouter, ...fns: AnyMiddlewareFn[]) {
+    this.m.push(...fns);
+    return this;
   },
 
   headers(this: AnyRouter, headers: HeadersInit) {
-    this.m.push([
-      2, Array.isArray(headers)
-        ? headers
-        : headers instanceof Headers
-          ? headers.entries().toArray()
-          : Object.entries(headers)
-    ]);
-  },
+    const headerList = Array.isArray(headers)
+      ? headers
+      : headers instanceof Headers
+        ? headers.entries().toArray()
+        : Object.entries(headers);
 
-  insert(this: AnyRouter, ...args: [any, any, any]) {
-    this.r.push(args);
-    return this;
-  },
-  any: initRoute(null),
+    // eslint-disable-next-line
+    this.m.push((next, c) => {
+      c.headers.push(...headerList);
+      return next();
+    });
 
-  catch(this: AnyRouter, e: StaticException | DynamicException<any>, a: any) {
-    // @ts-expect-error Don't need to pass a payload
-    this.e.push([(Array.isArray(e) ? e : e())[1], a]);
-    return this;
-  },
-  catchAll(this: AnyRouter, a: any) {
-    this.e.push([0, a]);
     return this;
   },
 
   route(this: AnyRouter, ...args: [string, any]) {
     if (args[0].includes('*'))
       throw new Error('Subrouter path cannot be dynamic');
+
     this.s.push(args as never);
     return this;
   }
@@ -170,6 +143,5 @@ export default (): Router => ({
   ...registers,
   r: [],
   m: [],
-  s: [],
-  e: []
+  s: []
 });

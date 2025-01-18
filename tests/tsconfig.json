@@ -22,8 +22,8 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
     "paths": {
-      "@mapl/tiny": ["../src/index.ts"],
-      "@mapl/tiny/*": ["../src/*"]
+      "zesti": ["../src/index.ts"],
+      "zesti/*": ["../src/*"]
     }
   }
 }

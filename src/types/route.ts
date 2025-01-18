@@ -2,11 +2,11 @@ import type { MaybePromise } from './utils.js';
 
 export interface Context {
   req: Request;
+
   headers: (readonly [string, string])[];
+
   status: number;
   statusText?: string;
-  pathStart: number;
-  pathEnd: number;
 }
 
 export interface BufferHandler<State, AfterArgs extends any[], Args extends any[] = []> {
@@ -43,14 +43,14 @@ export type TypedHandler<State, AfterArgs extends any[] = [], Args extends any[]
   HTMLHandler<State, Args, AfterArgs> |
   ResponseHandler<State, Args, AfterArgs>;
 
-export type AnyTypedHandler = TypedHandler<any, [], any[]> | TypedHandler<any, [any], any[]>;
+export type AnyTypedHandler = TypedHandler<Record<string, any>, [], any[]> | TypedHandler<Record<string, any>, [any], any[]>;
 
 export type Handler<
   State,
   AfterArgs extends any[] = [],
   Args extends any[] = []
 > = PlainHandler<State, Args, AfterArgs> | TypedHandler<State, Args, AfterArgs>;
-export type AnyHandler = Handler<any, any[], any[]>;
+export type AnyHandler = Handler<Record<string, any>, any[], any[]>;
 
 // null is for any handler
-export type HandlerData = [method: string | null, path: string, AnyHandler];
+export type HandlerData = [method: string | null, path: string, fn: AnyHandler, hasParam: boolean];

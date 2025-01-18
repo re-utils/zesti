@@ -1,11 +1,11 @@
-import type { AnyHandler, AnyTypedHandler, Context } from '../../types/route';
+import type { AnyHandler, AnyTypedHandler, Context } from '../../../types/route';
 import { isAsync } from '../../utils';
 
 const text = ['content-type', 'text/plain'] as const;
 const html = ['content-type', 'text/html'] as const;
 const json = ['content-type', 'application/json'] as const;
 
-export default (handler: AnyHandler, isScopeAsync: boolean, hasParam: boolean): (...c: any[]) => any => {
+export default (handler: AnyHandler, hasParam: boolean): (...c: any[]) => any => {
   let type: AnyTypedHandler['type'];
   let fn: (...c: any[]) => any;
 
@@ -17,7 +17,7 @@ export default (handler: AnyHandler, isScopeAsync: boolean, hasParam: boolean): 
     fn = handler.fn;
   }
 
-  isScopeAsync ||= isAsync(fn);
+  const isScopeAsync = isAsync(fn);
 
   switch (type) {
     case 'buffer':
