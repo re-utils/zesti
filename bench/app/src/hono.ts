@@ -1,11 +1,14 @@
 import { Hono } from "hono";
+import { pathMap } from '../reqs';
 
-export default new Hono()
-  .get('/user', (c) => c.body('User'))
-  .get('/user/comments', (c) => c.body('User Comments'))
-  .get('/user/avatar', (c) => c.body('User Avatar'))
-  .get('/user/lookup/email/:address', (c) => c.body('User Lookup Email Address'))
-  .get('/event/:id', (c) => c.body('Event'))
-  .get('/event/:id/comments', (c) => c.body('Event Comments'))
-  .get('/very/deeply/nested/route/hello/there', (c) => c.body('Very Deeply Nested Route'))
-  .get('/user/lookup/username/:username', (c) => c.body(`Hello ${c.req.param('username')}`));
+const app = new Hono();
+
+for (const path in pathMap) {
+  const fn: any = pathMap[path as keyof typeof pathMap];
+  app.get(path, fn.length === 0
+    ? (c) => c.body(fn())
+    : (c) => c.body(fn(c.req.param('one')))
+  );
+}
+
+export default app;

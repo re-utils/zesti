@@ -1,14 +1,15 @@
-import { Elysia } from 'elysia';
+import { Elysia, type Context } from 'elysia';
+import { pathMap } from '../reqs';
 
-const app = new Elysia({ aot: false })
-  .get('/user', () => 'User')
-  .get('/user/comments', () => 'User Comments')
-  .get('/user/avatar', () => 'User Avatar')
-  .get('/user/lookup/email/:address', () => 'User Lookup Email Address')
-  .get('/event/:id', () => 'Event')
-  .get('/event/:id/comments', () => 'Event Comments')
-  .get('/very/deeply/nested/route/hello/there', () => 'Very Deeply Nested Route')
-  .get('/user/lookup/username/:username', (c) => `Hello ${c.params.username}`);
+const app = new Elysia({ aot: false });
+
+for (const path in pathMap) {
+  const fn: any = pathMap[path as keyof typeof pathMap];
+  app.get(path, fn.length === 0
+    ? fn
+    : (c: Context) => fn(c.params.one)
+  );
+}
 
 // Pls don't kill my TSC
 export default app as any;

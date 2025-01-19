@@ -1,14 +1,15 @@
 import { createApp, createRouter, defineEventHandler, toWebHandler } from "h3";
+import { pathMap } from '../reqs';
 
-const router = createRouter()
-  .get('/user', defineEventHandler(() => 'User'))
-  .get('/user/comments', defineEventHandler(() => 'User Comments'))
-  .get('/user/avatar', defineEventHandler(() => 'User Avatar'))
-  .get('/user/lookup/email/:address', defineEventHandler(() => 'User Lookup Email Address'))
-  .get('/event/:id', defineEventHandler(() => 'Event'))
-  .get('/event/:id/comments', defineEventHandler(() => 'Event Comments'))
-  .get('/very/deeply/nested/route/hello/there', defineEventHandler(() => 'Very Deeply Nested Route'))
-  .get('/user/lookup/username/:username', defineEventHandler((event) => `Hello ${event.context.params!.username}`))
+const router = createRouter();
+
+for (const path in pathMap) {
+  const fn: any = pathMap[path as keyof typeof pathMap];
+  router.get(path, fn.length === 0
+    ? defineEventHandler(fn)
+    : defineEventHandler((ev) => fn(ev.context.params!.one))
+  );
+}
 
 const app = createApp().use(router);
 
