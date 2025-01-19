@@ -1,10 +1,12 @@
 import { createRouter, insertItem, type Router as BaseRouter } from '@mapl/router';
+
 import toHandler from './utils/toHandler';
 
 import type { AnyFn } from '../../types/utils';
 import type { BuildFn } from '../types';
 import type { AnyMiddlewareFn, AnyRouter } from '../..';
 import type { Context, HandlerData } from '../../types/route';
+
 import { matcher } from './utils/route';
 
 type RouteTree = [Record<string, BaseRouter<AnyFn>>, BaseRouter<AnyFn> | null];
@@ -53,7 +55,7 @@ const build = (router: AnyRouter, routesTree: RouteTree, cbs: AnyMiddlewareFn[],
 };
 
 /**
- * Build to the fastest the handler
+ * Build to the fastest handler
  */
 export default ((router, adapter) => {
   const routes: RouteTree = [ {}, null];
@@ -61,24 +63,24 @@ export default ((router, adapter) => {
 
   // This doesn't work with Cloudflare if you put it in the global scope
   const nf = new Response(null, { status: 404 });
-  const notFound = (): Response => nf;
 
   // Fallback method
   const fallback = routes[1] === null
-    ? notFound
-    : matcher(routes[1], notFound);
+    ? () => nf
+    : matcher(routes[1], () => nf);
 
   // Build for registered methods
-  const routeMap = Object.fromEntries(Object.entries(routes[0])
-    .map((pair) => [pair[0], matcher(pair[1], fallback as any)]));
+  const routeMap = new Map(Object.entries(routes[0])
+    .map((pair) => [pair[0], matcher(pair[1], fallback)]));
 
   // No adapter provided
   if (adapter == null) {
     return (r) => {
       const u = r.url;
       const s = u.indexOf('/', 12) + 1;
+      const e = u.indexOf('?', s);
 
-      return (routeMap[r.method] ?? fallback)(u.substring(s, u.indexOf('?', s) >>> 0), {
+      return (routeMap.get(r.method) ?? fallback)(e === -1 ? u.slice(s) : u.substring(s, e), {
         headers: [],
         status: 200,
         req: r
@@ -90,7 +92,13 @@ export default ((router, adapter) => {
   return (r, ...a: any[]) => {
     const u = r.url;
     const s = u.indexOf('/', 12) + 1;
+    const e = u.indexOf('?', s);
 
-    return (routeMap[r.method] ?? fallback)(u.substring(s, u.indexOf('?', s) >>> 0), adapter(r, ...a as any));
+    return (routeMap.get(r.method) ?? fallback)(e === -1 ? u.slice(s) : u.substring(s, e), adapter(r, ...a as any));
   };
 }) as BuildFn;
+
+/**
+ * Implementation note:
+ * - Though maps are slower at first, they won't get de-opted if you, for example, request a non-existent path, which causes the original object to be megamorphic
+ */

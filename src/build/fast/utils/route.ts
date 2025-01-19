@@ -8,17 +8,16 @@ import type { Context } from '../../../types/route';
  */
 export const matcher = (router: BaseRouter<AnyFn>, nf: (...args: any[]) => Response): (p: string, r: Context) => any => {
   // Slice the first slash out
-  const map = Object.fromEntries(router[0].map((pair) => [pair[0].slice(1), pair[1]]));
+  const map = new Map(router[0].map((pair) => [pair[0].slice(1), pair[1]]));
   const node = router[1];
 
-  return node === null
-    ? (p: string, c: Context) => map[p](c) ?? nf(p, c)
-    : (p: string, c: Context) => {
-      let t: any = map[p];
-      if (typeof t === 'undefined') {
-        t = [];
-        return (match(node, p, t, -1) as AnyFn | null)?.(t, c) ?? nf(p, c);
-      }
-      return (t as AnyFn)(c);
+  if (node !== null) {
+    const oldNf = nf;
+    nf = (p: string, c: Context) => {
+      const params: string[] = [];
+      return (match(node, p, params, -1) as AnyFn | null)?.(params, c) ?? oldNf(p, c);
     };
+  }
+
+  return (p: string, c: Context) => map.get(p)?.(c) ?? nf(p, c);
 };

@@ -16,6 +16,7 @@
     "lint:fix": "eslint ./src --fix"
   },
   "devDependencies": {
+    "0x": "^5.8.0",
     "@cloudflare/workers-types": "^4.20250109.0",
     "@mitata/counters": "^0.0.8",
     "@stylistic/eslint-plugin": "latest",
