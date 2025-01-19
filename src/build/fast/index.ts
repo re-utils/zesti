@@ -97,8 +97,3 @@ export default ((router, adapter) => {
     return (routeMap.get(r.method) ?? fallback)(e === -1 ? u.slice(s) : u.substring(s, e), adapter(r, ...a as any));
   };
 }) as BuildFn;
-
-/**
- * Implementation note:
- * - Though maps are slower at first, they won't get de-opted if you, for example, request a non-existent path, which causes the original object to be megamorphic
- */
