@@ -1,4 +1,4 @@
-import { barplot as plot, run, bench } from 'mitata';
+import { barplot as plot, run, bench, do_not_optimize } from 'mitata';
 
 // Apps
 import elysia from './src/elysia';
@@ -12,13 +12,13 @@ import type { FetchFn } from 'zesti/build/types';
 // Example benchmark
 plot(() => {
   const apps: [string, { fetch: FetchFn }][] = [
-    ['Zesti', zesti],
-    ['Elysia', elysia],
     ['H3', h3],
     ['Hono', hono],
+    ['Zesti', zesti],
+    ['Elysia', elysia]
   ];
 
-  const reqs = Array.from({ length: 10000 }, (_, i) => (i %= 20, new Request(
+  const reqs = Array.from({ length: 5000 }, (_, i) => (i %= 20, new Request(
     'http://127.0.0.1:3000' + (i === 0
       ? '/user'
       : i === 1
@@ -42,8 +42,8 @@ plot(() => {
     console.log(obj.fetch.toString());
 
     bench(name, () => {
-      for (let i = 0, _; i < reqs.length; i++)
-        _ = obj.fetch(reqs[i]);
+      for (let i = 0; i < reqs.length; i++)
+        do_not_optimize(obj.fetch(reqs[i]));
     }).gc('inner');
   }
   console.log('Done setting up apps...');
