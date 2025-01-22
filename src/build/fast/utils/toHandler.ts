@@ -79,20 +79,20 @@ export default (handler: AnyHandler, hasParam: boolean): (...c: any[]) => any =>
         ? hasParam
           ? async (p: any, c: Context) => {
             c.headers.push(json);
-            return new Response(await fn(p, c), c as any);
+            return new Response(JSON.stringify(await fn(p, c)), c as any);
           }
           : async (c: Context) => {
             c.headers.push(json);
-            return new Response(await fn(c), c as any);
+            return new Response(JSON.stringify(await fn(c)), c as any);
           }
         : hasParam
           ? (p: any, c: Context) => {
             c.headers.push(json);
-            return new Response(fn(p, c), c as any);
+            return new Response(JSON.stringify(fn(p, c)), c as any);
           }
           : (c: Context) => {
             c.headers.push(json);
-            return new Response(fn(c), c as any);
+            return new Response(JSON.stringify(fn(c)), c as any);
           };
   }
 };

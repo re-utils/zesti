@@ -34,7 +34,7 @@ export const stringifyQuery = (query: Record<string, QueryValue | QueryValue[]>)
 
 export const createRPCMethod = (root: string, defaultMethod: string, defaultInit: RequestInit, fetch: ClientOptions['fetch']): (path: string, init?: RequestInit & { body?: unknown, query?: unknown, params?: string[] }) => Promise<Response> => {
   if (defaultMethod !== '$')
-    defaultInit.method = defaultMethod;
+    defaultInit.method = defaultMethod.toUpperCase();
 
   // eslint-disable-next-line
   return (path, init) => {
@@ -73,9 +73,10 @@ export default <const T extends AnyRouter>(root: string, exposeMethods: (keyof C
   // Easier path concatenation
   if (root.endsWith('/')) root = root.slice(0, -1);
 
+  // Bind global fetch
   // eslint-disable-next-line
-  const fetch: ClientOptions['fetch'] = options?.fetch ?? ((a, b) => fetch(a, b));
+  const defaultFetch: ClientOptions['fetch'] = options?.fetch ?? ((a, b) => fetch(a, b));
   const defaultInit = options?.init ?? {};
 
-  return Object.fromEntries(exposeMethods.map((m) => [m, createRPCMethod(root, m as string, defaultInit, fetch)])) as any;
+  return Object.fromEntries(exposeMethods.map((m) => [m, createRPCMethod(root, m as string, { ...defaultInit }, defaultFetch)])) as any;
 };

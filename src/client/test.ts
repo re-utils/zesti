@@ -4,9 +4,13 @@ import build from '../build/fast';
 import type { AnyRouter } from '..';
 import type { Client } from './types';
 
-export const searchMethods = (methods: string[], router: AnyRouter): void => {
-  for (const routes of router.r) methods.push(routes[0]?.toLowerCase() ?? '$');
-  for (const subroutes of router.s) searchMethods(methods, subroutes[1]);
+export const scanMethods = (methods: string[], router: AnyRouter): void => {
+  for (const routes of router.r) {
+    const method = routes[0]?.toLowerCase() ?? '$';
+    if (!methods.includes(method))
+      methods.push(method);
+  }
+  for (const subroutes of router.s) scanMethods(methods, subroutes[1]);
 };
 
 /**
@@ -17,7 +21,7 @@ export default <T extends AnyRouter>(router: T, options?: Partial<ClientOptions>
   (options ??= {}).fetch = async (a, b) => fn(new Request(a, b));
 
   const methods: any[] = [];
-  searchMethods(methods, router);
+  scanMethods(methods, router);
 
   return client<T>('http://127.0.0.1:3000', methods, options);
 };
