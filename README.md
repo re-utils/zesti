@@ -23,5 +23,5 @@ export default {
 };
 
 // Or with Cloudflare
-export default lazyBuild(build, [app]);
+export default lazyBuild(build, app);
 ```
