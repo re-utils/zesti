@@ -1,4 +1,3 @@
-import type { InferParams } from '../index.js';
 import type { AwaitedReturn, ConcatPath, MaybePromise, PickIfExists } from './utils.js';
 
 export interface Context {
@@ -71,17 +70,18 @@ export type InferHandlerRequestInit<T, Path extends string> =
   (T extends Handler<infer State, any>
     ? PickIfExists<State, 'body' | 'query'>
     : {}
-  ) & (InferParams<Path>['length'] extends 0
-    ? {}
-    : { params: InferParams<Path> });
+  ) & (Path extends `${string}*${string}`
+    ? { params: [string | number, ...(string | number)[]] }
+    : {}
+  );
 
 export type InferHandlerResponse<T extends AnyHandler> = T extends AnyTypedHandler
   ? InferTypedHandlerResponse<T>
   : TypedResponse<AwaitedReturn<T>>;
 
 export type InferHandlerRPC<T extends HandlerData, Prefix extends string> = Record<
-  null extends T[0] ? '$' : T[0] & {},
+  null extends T[0] ? '$' : Lowercase<T[0] & {}>,
   keyof InferHandlerRequestInit<T[2], T[1]> extends never
-    ? (path: ConcatPath<Prefix, T[1]>, init?: RequestInit) => InferHandlerResponse<T[2]>
-    : (path: ConcatPath<Prefix, T[1]>, init?: InferHandlerRequestInit<T[2], T[1]> & RequestInit) => InferHandlerResponse<T[2]>
+    ? (path: ConcatPath<Prefix, T[1]>, init?: RequestInit) => Promise<InferHandlerResponse<T[2]>>
+    : (path: ConcatPath<Prefix, T[1]>, init: InferHandlerRequestInit<T[2], T[1]> & RequestInit) => Promise<InferHandlerResponse<T[2]>>
 >;

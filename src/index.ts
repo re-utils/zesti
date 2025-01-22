@@ -88,7 +88,7 @@ export type Router<
   };
 
 export type AnyState = Record<string, any>;
-export type AnyRouter = Router<AnyState, any[], any[]>;
+export type AnyRouter = Router<AnyState, HandlerData[], SubrouterData[]>;
 
 export type MiddlewareFn<State extends AnyState> = (...args: [
   next: () => MaybePromise<Response>, Context & State
