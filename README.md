@@ -120,4 +120,11 @@ const app = client<typeof app>(
   });
   await res.text(); // 'Hi'
 }
+
+// backend.test.ts
+import app from '@server/main';
+import client from 'zesti/client';
+
+// No need to manually expose methods like the client
+const tester = client(app);
 ```
