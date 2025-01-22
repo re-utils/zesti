@@ -3,9 +3,5 @@
     "elysia": "^1.2.10",
     "h3": "^1.13.1",
     "hono": "^4.6.17"
-  },
-  "scripts": {
-    "app:node": "tsx --expose-gc --allow-natives-syntax app/index.bench.ts",
-    "app:bun": "bun run app/index.bench.ts"
   }
 }
