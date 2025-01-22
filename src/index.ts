@@ -110,15 +110,15 @@ const registers: Router = {
     return this;
   },
 
-  headers(this: AnyRouter, headers: HeadersInit) {
-    const headerList = Array.isArray(headers)
-      ? headers
-      : headers instanceof Headers
+  headers(this: AnyRouter, headers: any) {
+    if (!Array.isArray(headers)) {
+      headers = headers instanceof Headers
         ? headers.entries().toArray()
         : Object.entries(headers);
+    }
 
     this.m.push(async (next, c) => {
-      c.headers.push(...headerList);
+      c.headers.push(...headers);
       return next();
     });
 
