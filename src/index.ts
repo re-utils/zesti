@@ -25,12 +25,19 @@ export type RouteRegister<
   SubRouters
 >;
 
+export type SubrouterData = [string, AnyRouter];
+
 export type Router<
   State extends AnyState = {},
   Routes extends HandlerData[] = [],
-  SubRouters extends [string, AnyRouter][] = []
+  SubRouters extends SubrouterData[] = []
 > = { [Method in Methods]: RouteRegister<Uppercase<Method>, State, Routes, SubRouters> }
   & {
+    /**
+     * Type of the current state
+     */
+    stateType: State,
+
     // Weird stuff
     any: RouteRegister<null, State, Routes, SubRouters>,
 

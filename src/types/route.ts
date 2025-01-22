@@ -1,4 +1,5 @@
-import type { MaybePromise } from './utils.js';
+import type { InferParams } from '../index.js';
+import type { AwaitedReturn, ConcatPath, MaybePromise, PickIfExists } from './utils.js';
 
 export interface Context {
   req: Request;
@@ -53,3 +54,34 @@ export type AnyHandler = Handler<any, [any]> | Handler<any>;
 
 // null is for any handler
 export type HandlerData = [method: string | null, path: string, fn: AnyHandler, hasParam: boolean];
+
+export interface TypedResponse<T> extends Response {
+  text: () => Promise<T extends string ? T : string>;
+  json: () => Promise<T extends string | number | bigint | boolean | symbol | undefined | null ? never : T>;
+}
+
+// Client API
+export type InferTypedHandlerResponse<T extends AnyTypedHandler> = T['type'] extends 'buffer' | 'text' | 'html' | 'json'
+  ? TypedResponse<AwaitedReturn<T['fn']>>
+  : T['type'] extends 'plain'
+    ? AwaitedReturn<T['fn']>
+    : unknown;
+
+export type InferHandlerRequestInit<T, Path extends string> =
+  (T extends Handler<infer State, any>
+    ? PickIfExists<State, 'body' | 'query'>
+    : {}
+  ) & (InferParams<Path>['length'] extends 0
+    ? {}
+    : { params: InferParams<Path> });
+
+export type InferHandlerResponse<T extends AnyHandler> = T extends AnyTypedHandler
+  ? InferTypedHandlerResponse<T>
+  : TypedResponse<AwaitedReturn<T>>;
+
+export type InferHandlerRPC<T extends HandlerData, Prefix extends string> = Record<
+  null extends T[0] ? '$' : T[0] & {},
+  keyof InferHandlerRequestInit<T[2], T[1]> extends never
+    ? (path: ConcatPath<Prefix, T[1]>, init?: RequestInit) => InferHandlerResponse<T[2]>
+    : (path: ConcatPath<Prefix, T[1]>, init?: InferHandlerRequestInit<T[2], T[1]> & RequestInit) => InferHandlerResponse<T[2]>
+>;

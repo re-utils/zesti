@@ -4,7 +4,7 @@ import toHandler from './utils/toHandler';
 
 import type { AnyFn } from '../../types/utils';
 import type { BuildFn } from '../types';
-import type { AnyMiddlewareFn, AnyRouter } from '../..';
+import type { AnyMiddlewareFn, AnyRouter, SubrouterData } from '../..';
 import type { Context, HandlerData } from '../../types/route';
 
 import { matcher } from './utils/route';
@@ -48,7 +48,7 @@ const build = (router: AnyRouter, routesTree: RouteTree, cbs: AnyMiddlewareFn[],
     );
   }
 
-  for (let i = 0, x: [string, AnyRouter], routes = router.s; i < routes.length; i++) {
+  for (let i = 0, x: SubrouterData, routes = router.s; i < routes.length; i++) {
     x = routes[i];
     build(x[1], routesTree, mds, x[0] === '/' ? prefix : prefix + x[0]);
   }
