@@ -1,6 +1,6 @@
 /// <reference types="@types/deno" />
-import router, { type Router } from '.';
-import type { BuildAdapter } from './build/types';
+import router, { type Router } from '..';
+import type { BuildAdapter } from '../build/types';
 
 export interface InitState {
   info: {

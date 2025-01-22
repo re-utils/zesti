@@ -1,6 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
-import router, { type Router } from '.';
-import type { BuildAdapter, BuildFn, FetchFn } from './build/types';
+import router, { type Router } from '..';
+import type { BuildAdapter, BuildFn, FetchFn } from '../build/types';
 
 export interface InitState {
   // @ts-expect-error User should provide the type

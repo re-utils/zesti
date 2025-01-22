@@ -8,7 +8,7 @@ import router from 'zesti';
 import build from 'zesti/build/fast';
 
 // Use with cloudflare
-import { lazyBuild } from 'zesti/cf';
+import { lazyBuild } from 'zesti/adapter/cloudflare';
 
 // Create a router
 const app = router()
