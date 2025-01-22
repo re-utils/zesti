@@ -8,10 +8,9 @@
   "main": "./index.js",
   "types": "./index.d.ts",
   "scripts": {
-    "build:test": "bun scripts/build.ts && bun test",
-    "bench": "bun scripts/bench.ts",
-    "bench-node": "bun scripts/bench-node.ts",
-    "build:publish": "bun build:test && bun scripts/publish.ts",
+    "task": "bun scripts/task.ts",
+    "build:test": "bun task build && bun test",
+    "build:publish": "bun task build && bun task reportSize && bun task publish",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix"
   },
@@ -19,14 +18,16 @@
     "0x": "^5.8.0",
     "@cloudflare/workers-types": "^4.20250109.0",
     "@stylistic/eslint-plugin": "latest",
-    "@types/bun": "^1.1.16",
+    "@types/bun": "^1.1.18",
     "@types/deno": "^2.0.0",
+    "@types/uglify-js": "^3.17.5",
     "eslint": "latest",
     "eslint-plugin-jsdoc": "latest",
     "mitata": "^1.0.30",
     "tsx": "latest",
     "typescript": "latest",
-    "typescript-eslint": "latest"
+    "typescript-eslint": "latest",
+    "uglify-js": "^3.19.3"
   },
   "dependencies": {
     "@mapl/router": "^0.3.3"
