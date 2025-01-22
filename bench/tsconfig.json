@@ -25,7 +25,8 @@
     "noPropertyAccessFromIndexSignature": false,
     "paths": {
       "zesti": ["../src/index.ts"],
-      "zesti/*": ["../src/*"]
+      "zesti/*": ["../src/*"],
+      "@lib": ["./lib.ts"]
     }
   }
 }

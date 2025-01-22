@@ -10,6 +10,7 @@ import zesti from './src/zesti';
 // Zesti has types for these stuff
 import type { FetchFn } from 'zesti/build/types';
 import { requests, setupTests } from './reqs';
+import { defaultConfig } from '@lib';
 
 const apps: [string, { fetch: FetchFn }][] = [
   ['H3', h3],
@@ -35,5 +36,5 @@ const apps: [string, { fetch: FetchFn }][] = [
   });
 
   // Start the benchmark
-  run();
+  run(defaultConfig);
 })();

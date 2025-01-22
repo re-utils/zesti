@@ -6,26 +6,38 @@ const DIR = import.meta.dir + '/../bench/';
 const OUTDIR = DIR + '.out/';
 
 const args = process.argv;
-const exe = { raw: 'bun run' };
+const config = {
+  emit: false,
+  format: 'mitata',
+  runtime: 'bun'
+}
 
-let doOutput = false;
+const getExec = () => {
+  switch (config.runtime) {
+    case 'bun': return { raw: 'bun run' };
+    case 'node': return { raw: 'bun tsx --expose-gc --allow-natives-syntax' };
+  }
+}
 
 const run = async (path: string) => {
   console.log('Running benchmark:', path);
 
-  if (doOutput) {
-    const target = OUTDIR + path.slice(0, path.indexOf('.bench.ts')) + '.out';
+  if (config.emit) {
+    const target = OUTDIR + path.slice(0, path.indexOf('.bench.ts')) + '.' + config.runtime + '.out';
+
+    // Create the file recursively
     await Bun.write(target, '\0');
     await Bun.write(target, '');
-    await exec`${exe} ${path} > ${Bun.file(target)}`
+
+    await exec`${getExec()} ${path} ${config.format} > ${Bun.file(target)}`;
   } else
-    await exec`${exe} ${path}`;
+    await exec`${getExec()} ${path} ${config.format}`;
 }
 
 {
   let idx = args.indexOf('--node');
   if (idx !== -1) {
-    exe.raw = 'bun tsx --expose-gc --allow-natives-syntax';
+    config.runtime = 'node';
     args.splice(idx, 1);
   }
 
@@ -36,12 +48,19 @@ const run = async (path: string) => {
       fs.rmdirSync(OUTDIR, { recursive: true });
     fs.mkdirSync(OUTDIR);
 
-    doOutput = true;
+    config.emit = true;
+    args.splice(idx, 1);
+  }
+
+  idx = args.indexOf('--markdown');
+  if (idx !== -1) {
+    config.format = 'markdown';
     args.splice(idx, 1);
   }
 }
 
 Bun.$.cwd(DIR);
+
 const exactBench = args[2];
 
 if (exactBench != null)

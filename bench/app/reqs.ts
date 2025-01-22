@@ -14,13 +14,13 @@ export const requests = Array.from({ length: 1000 }, (_, i) => new Request('http
 
 export const setupTests = async (label: string, assertEquals: (actual: any, expected: any) => any, obj: { fetch: Function }) => {
   const params = new Array(5).fill('' + Math.random());
-  console.log('Testing', label);
+  //console.log('Testing', label);
 
   for (const path in pathMap) {
     // Path to match
     let idx = 0;
     const exactPath = path.replace(/\/:\w+/g, () => '/' + params[idx++]);
-    console.log('* Match path', '"' + exactPath + '"', 'with', '"' + path + '"');
+    //console.log('* Match path', '"' + exactPath + '"', 'with', '"' + path + '"');
 
     // Response
     const res = await obj.fetch(

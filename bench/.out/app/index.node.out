@@ -1,34 +1,3 @@
-# Zesti
-A small and fast Edge framework.
-
-```ts
-import router from 'zesti';
-
-// Use the fastest builder
-import build from 'zesti/build/fast';
-
-// Use with cloudflare
-import { lazyBuild } from 'zesti/adapter/cloudflare';
-
-// Create a router
-const app = router()
-  .get('/', () => 'Hi')
-  .get('/*', (params) => params[0]);
-
-// Run with Bun or Deno or other runtimes
-export default {
-  // Build the router and send it
-  // to the runtime to run
-  fetch: build(app)
-};
-
-// Or with Cloudflare
-export default lazyBuild(build, app);
-```
-
-## Speed
-**Zesti** is the fastest compared to other **Edge** frameworks.
-
 clk: ~0.37 GHz
 cpu: Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz
 runtime: node 22.13.1 (x64-linux)
