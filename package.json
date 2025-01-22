@@ -10,7 +10,7 @@
   "scripts": {
     "task": "bun scripts/task.ts",
     "build:test": "bun task build && bun test",
-    "build:publish": "bun task build && bun task reportSize && bun task publish",
+    "build:publish": "bun task build && bun task report-size && bun task publish",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix"
   },
