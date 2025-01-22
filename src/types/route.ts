@@ -56,7 +56,7 @@ export type HandlerData = [method: string | null, path: string, fn: AnyHandler, 
 
 export interface TypedResponse<T> extends Response {
   text: () => Promise<T extends string ? T : string>;
-  json: () => Promise<T extends string | number | bigint | boolean | symbol | undefined | null ? never : T>;
+  json: () => Promise<T extends string | number | bigint | boolean | symbol | undefined | null ? unknown : T>;
 }
 
 // Client API

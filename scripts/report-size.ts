@@ -6,7 +6,6 @@ const sizes: {
   entry: string,
   size: number,
   minified: number,
-  gzip: number,
   minifiedGzip: number,
 }[] = [];
 
@@ -28,18 +27,24 @@ for await (const path of new Bun.Glob('**/*.js').scan(DIR)) {
     entry: path,
     size: file.size,
     minified: Buffer.from(minfiedCode).byteLength,
-    gzip: Bun.gzipSync(code).byteLength,
     minifiedGzip: Bun.gzipSync(minfiedCode).byteLength
   });
 }
 
 sizes.sort((a, b) => a.size - b.size);
 
+// Count total
+sizes.push(sizes.reduce((a, b) => ({
+  entry: 'Total',
+  size: a.size + b.size,
+  minified: a.minified + b.minified,
+  minifiedGzip: a.minifiedGzip + b.minifiedGzip
+})));
+
 // Convert to table columns
 console.table(sizes.map((val) => ({
   Entry: val.entry,
   Size: toByte(val.size),
   Minify: toByte(val.minified),
-  GZIP: toByte(val.gzip),
   "Minify GZIP": toByte(val.minifiedGzip)
 })));
