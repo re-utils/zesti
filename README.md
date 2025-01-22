@@ -27,11 +27,11 @@ export default lazyBuild(build, app);
 ```
 
 ## Speed
-**Zesti** is the fastest compared to other **Edge** frameworks.
+**Zesti** is the fastest compared to other Edge web frameworks.
 
-clk: ~0.37 GHz
-cpu: Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz
-runtime: node 22.13.1 (x64-linux)
+- clk: ~0.37 GHz
+- cpu: Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz
+- runtime: node 22.13.1 (x64-linux)
 
 | benchmark |              avg |         min |         p75 |         p99 |         max |
 | ------ | ---------------- | ----------- | ----------- | ----------- | ----------- |
