@@ -33,6 +33,13 @@ Zesti is the fastest, compared to other Edge web frameworks.
 | Zesti  | ` 17.62 ms/iter` | ` 15.34 ms` | ` 18.82 ms` | ` 19.49 ms` | ` 19.96 ms` |
 | Elysia | ` 19.78 ms/iter` | ` 15.49 ms` | ` 21.67 ms` | ` 22.59 ms` | ` 23.65 ms` |
 
+Benchmarks the time for each framework to handle 1,000 `Request` object.
+You can run the benchmark by cloning the reposity and run:
+```console
+# Require Bun for scripts
+bun task bench --node
+```
+
 ## Size
 Zesti main module is only 675 bytes minified, and the largest build preset is under 2kB minified.
 There are many built-in middlewares but they only get bundled when necessary.
