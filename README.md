@@ -35,7 +35,7 @@ Zesti is the fastest, compared to other Edge web frameworks.
 
 Benchmarks the time for each framework to handle 1,000 `Request` object.
 You can run the benchmark by cloning the reposity and run:
-```console
+```sh
 # Require Bun for scripts
 bun task bench --node
 ```
