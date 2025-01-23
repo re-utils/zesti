@@ -33,7 +33,7 @@ Zesti is the fastest, compared to other Edge web frameworks.
 | Zesti  | ` 17.62 ms/iter` | ` 15.34 ms` | ` 18.82 ms` | ` 19.49 ms` | ` 19.96 ms` |
 | Elysia | ` 19.78 ms/iter` | ` 15.49 ms` | ` 21.67 ms` | ` 22.59 ms` | ` 23.65 ms` |
 
-Benchmarks the time for each framework to handle 1,000 `Request` object.
+This benchmark measures the time for each framework to handle 1,000 `Request` object.
 You can run the benchmark by cloning the reposity and run:
 ```sh
 # Require Bun for scripts
