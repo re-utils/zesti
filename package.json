@@ -7,6 +7,11 @@
   "type": "module",
   "main": "./index.js",
   "types": "./index.d.ts",
+  "homepage": "https://github.com/re-utils/zesti",
+  "repository": {
+    "url": "https://github.com/re-utils/zesti",
+    "type": "github"
+  },
   "scripts": {
     "task": "bun scripts/task.ts",
     "build:test": "bun task build && bun test",

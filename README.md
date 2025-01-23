@@ -41,8 +41,7 @@ bun task bench --node
 ```
 
 ## Size
-Zesti main module is only 675 bytes minified, and the largest build preset is under 2kB minified.
-There are many built-in middlewares but they only get bundled when necessary.
+Zesti main module is only 675 bytes minified, and the largest build preset is under 2KB minified. Other components are only bundled when necessary.
 
 ## Runtime-agnostic
 Zesti is runtime-agnostic by default.
