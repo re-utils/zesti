@@ -69,7 +69,7 @@ Runtimes with an adapter includes:
 
 With Cloudflare, you need to use `lazyBuild` from the adapter package.
 ```ts
-import { router, lazyBuild } from 'zesti/adapter/cloudflare';
+import { router, lazyBuild, buildAdapter } from 'zesti/adapter/cloudflare';
 import build from 'zesti/build/fast';
 
 const app = router()
@@ -79,11 +79,10 @@ const app = router()
   });
 
 // Pass a build function and your app
-// Automatically build using the cloudflare build adapter
-export default lazyBuild(build, app);
+export default lazyBuild(() => build(app, buildAdapter));
 
 // Add other Cloudflare methods
-export default lazyBuild(build, app, {
+export default lazyBuild(() => build(app, buildAdapter), {
   scheduled: async (controller, env, ctx) => {
     // Handle cronjob...
   },
