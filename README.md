@@ -81,6 +81,15 @@ const app = router()
 // Pass a build function and your app
 // Automatically build using the cloudflare build adapter
 export default lazyBuild(build, app);
+
+// Add other Cloudflare methods
+export default lazyBuild(build, app, {
+  scheduled: async (controller, env, ctx) => {
+    // Handle cronjob...
+  },
+
+  // Other methods...
+})
 ```
 
 ## DX
@@ -129,7 +138,7 @@ const app = client<typeof app>(
 
 // backend.test.ts
 import app from '@server/main';
-import client from 'zesti/client';
+import client from 'zesti/client/test';
 
 // No need to manually expose methods like the client
 const tester = client(app);
