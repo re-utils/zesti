@@ -23,7 +23,7 @@ export const buildAdapter: BuildAdapter<InitState, FetchArgs> = (r, e, c) => ({
   ctx: c
 });
 
-export const lazyBuild = <T extends {}>(buildFn: BuildFn, rt: Parameters<BuildFn>[0], o: T = {} as T): LazyBuildResult & T => {
+export const lazyBuild = <T extends ExportedHandler<InitState['env']>>(buildFn: BuildFn, rt: Parameters<BuildFn>[0], o: T = {} as T): LazyBuildResult & T => {
   // eslint-disable-next-line
   (o as any as LazyBuildResult).fetch = (r, e, c) => ((o as any as LazyBuildResult).fetch = buildFn(rt, buildAdapter))(r, e, c);
   return o as any as LazyBuildResult & T;
