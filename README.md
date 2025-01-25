@@ -107,7 +107,7 @@ Zesti has a small client for querying on the frontend and testing on the backend
 ```ts
 // @server/main.ts
 const app = router()
-  .get('/', () => c.send('Hi', 200))
+  .get('/', (c) => c.send('Hi', 200))
   .get('/*', (params, c) => c.send(params[0], 200));
 
 export default app;
