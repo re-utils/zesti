@@ -2,7 +2,6 @@ import { describe, test, expect } from 'bun:test';
 
 import router from 'zesti';
 import client from 'zesti/client/test';
-import type { PickIfExists } from 'zesti/types/utils';
 
 describe('Match route', () => {
   const server = router()
@@ -43,11 +42,11 @@ describe('Body parsing', () => {
 
   const app = client(server);
 
-  describe('POST /', async () => {
+  test('POST /', async () => {
     const res = await app.post('/', {
       body: 'Hi'
     });
     expect(res.status).toBe(200);
-    expect(await res.text()).toHaveProperty('Hi');
+    expect(await res.text()).toBe('Hi');
   });
 });
