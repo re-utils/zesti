@@ -5,7 +5,7 @@ import type { BuildFn } from '../types';
 import type { AnyMiddlewareFn, AnyRouter, SubrouterData } from '../..';
 import type { Context, HandlerData } from '../../types/route';
 
-import { matcher } from './utils/route';
+import { matcher } from './route';
 import GenericContext from '../context';
 
 type RouteTree = [Record<string, BaseRouter<AnyFn>>, BaseRouter<AnyFn> | null];

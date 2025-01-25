@@ -1,7 +1,8 @@
 import match from '@mapl/router/tree/matcher';
+
 import type { Router as BaseRouter } from '@mapl/router';
-import type { AnyFn } from '../../../types/utils';
-import type { Context } from '../../../types/route';
+import type { AnyFn } from '../../types/utils';
+import type { Context } from '../../types/route';
 
 /**
  * Create a matcher
