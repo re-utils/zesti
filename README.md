@@ -9,8 +9,8 @@ import build from 'zesti/build/fast';
 
 // Create a router
 const app = router()
-  .get('/', () => 'Hi')
-  .get('/*', (params) => params[0]);
+  .get('/', (c) => c.send('Hi'))
+  .get('/*', (params, c) => c.send(params[0]));
 
 export default {
   // Build the router and send it
@@ -22,18 +22,18 @@ export default {
 ## Speed
 Zesti is the fastest, compared to other Edge web frameworks.
 
-- clk: ~0.37 GHz
+- clk: ~1.55 GHz
 - cpu: Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz
 - runtime: node 22.13.1 (x64-linux)
 
 | benchmark |              avg |         min |         p75 |         p99 |         max |
 | ------ | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| H3     | ` 36.60 ms/iter` | ` 27.28 ms` | ` 38.52 ms` | ` 47.79 ms` | ` 57.51 ms` |
-| Hono   | ` 25.87 ms/iter` | ` 19.36 ms` | ` 26.24 ms` | ` 33.77 ms` | ` 38.45 ms` |
-| Zesti  | ` 17.62 ms/iter` | ` 15.34 ms` | ` 18.82 ms` | ` 19.49 ms` | ` 19.96 ms` |
-| Elysia | ` 19.78 ms/iter` | ` 15.49 ms` | ` 21.67 ms` | ` 22.59 ms` | ` 23.65 ms` |
+| H3     | `11.31 ms/iter` | `9.19 ms` | `11.46 ms` | `14.79 ms` | `15.37 ms` |
+| Hono   | `7.42 ms/iter` | `5.72 ms` | `8.15 ms` | `8.86 ms` | `9.25 ms` |
+| Zesti  | `5.99 ms/iter` | `5.26 ms` | `6.29 ms` | `6.89 ms` | `7.32 ms` |
+| Elysia | `6.90 ms/iter` | `5.53 ms` | `7.35 ms` | `7.93 ms` | `7.97 ms` |
 
-This benchmark measures the time for each framework to handle 1,000 `Request` object.
+This benchmark measures the time for each framework to handle 1,000 request objects.
 You can run the benchmark by cloning the reposity and run:
 ```sh
 # Require Bun for scripts
@@ -43,8 +43,8 @@ bun task bench --node
 ## Size
 Zesti main module is only 675 bytes minified, and the largest build preset is under 2KB minified. Other components are only bundled when necessary.
 
-## Runtime-agnostic
-Zesti is runtime-agnostic by default.
+## Cross runtime
+Zesti works on every runtime by default.
 
 You can access runtime-specific properties using adapters:
 ```ts
@@ -54,7 +54,7 @@ import build from 'zesti/build/fast';
 const app = router()
   .get('/', (c) => {
     console.log(c.server); // Access Bun server info
-    return 'Hi';
+    return c.send('Hi');
   });
 
 Bun.serve({
@@ -75,7 +75,7 @@ import build from 'zesti/build/fast';
 const app = router()
   .get('/', (c) => {
     console.log(c.env, c.ctx); // Access cloudflare Env and Context
-    return 'Hi';
+    return c.send('Hi');
   });
 
 // Pass a build function and your app
@@ -99,16 +99,16 @@ A really simple example is strictly typed path parameters and router.
 // App is inferred with route handler types
 const app = router()
   // Path parameters are strictly typed so you don't access unknown values
-  .get('/user/*/info', (params) => params[0])
-  .get('/user/*/**', (params) => params[0] + params[1]);
+  .get('/user/*/info', (params, c) => c.send(params[0]))
+  .get('/user/*/**', (params, c) => c.send(params[0] + params[1]));
 ```
 
 Zesti has a small client for querying on the frontend and testing on the backend.
 ```ts
 // @server/main.ts
 const app = router()
-  .get('/', () => 'Hi')
-  .get('/*', (params) => params[0]);
+  .get('/', () => c.send('Hi', 200))
+  .get('/*', (params, c) => c.send(params[0], 200));
 
 export default app;
 
@@ -140,5 +140,6 @@ import app from '@server/main';
 import client from 'zesti/client/test';
 
 // No need to manually expose methods like the client
+// Use this to test your backend code
 const tester = client(app);
 ```
