@@ -1,13 +1,12 @@
 import { createRouter, insertItem, type Router as BaseRouter } from '@mapl/router';
 
-import toHandler from './utils/toHandler';
-
 import type { AnyFn } from '../../types/utils';
 import type { BuildFn } from '../types';
 import type { AnyMiddlewareFn, AnyRouter, SubrouterData } from '../..';
 import type { Context, HandlerData } from '../../types/route';
 
 import { matcher } from './utils/route';
+import GenericContext from '../context';
 
 type RouteTree = [Record<string, BaseRouter<AnyFn>>, BaseRouter<AnyFn> | null];
 
@@ -18,7 +17,7 @@ const build = (router: AnyRouter, routesTree: RouteTree, cbs: AnyMiddlewareFn[],
   for (let i = 0, x: HandlerData, routes = router.r; i < routes.length; i++) {
     x = routes[i];
 
-    const f = toHandler(x[2], x[3]);
+    const f = x[2];
     insertItem(
       // @ts-expect-error Hey
       x[0] === null
@@ -42,6 +41,7 @@ const build = (router: AnyRouter, routesTree: RouteTree, cbs: AnyMiddlewareFn[],
             let idx = 0;
             const next = (): any => idx < mdsLen
               ? mds[idx++](next, c)
+              // @ts-expect-error Only 1 arg
               : f(c);
             return next();
           }
@@ -80,11 +80,7 @@ export default ((router, adapter) => {
       const s = u.indexOf('/', 12) + 1;
       const e = u.indexOf('?', s);
 
-      return (routeMap.get(r.method) ?? fallback)(e === -1 ? u.slice(s) : u.substring(s, e), {
-        headers: [],
-        status: 200,
-        req: r
-      });
+      return (routeMap.get(r.method) ?? fallback)(e === -1 ? u.slice(s) : u.substring(s, e), new GenericContext(r) as Context);
     };
   }
 

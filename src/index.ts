@@ -138,12 +138,11 @@ const registers: Router = {
 
     this.s.push(args as never);
     return this;
-  }
-} as any;
+  },
 
-export default (): Router => ({
-  ...registers,
   r: [],
   m: [],
   s: []
-});
+} as any;
+
+export default (): Router => Object.create(registers);

@@ -5,12 +5,9 @@ import client from 'zesti/client/test';
 
 describe('Match route', () => {
   const server = router()
-    .get('/', () => 'Hi')
-    .get('/*', (params) => params[0])
-    .post("/json", {
-      type: 'json',
-      fn: () => ({ now: performance.now() })
-    });
+    .get('/', (c) => c.body('Hi'))
+    .get('/*', (params, c) => c.body(params[0]))
+    .post("/json", (c) => c.json({ now: performance.now() }));
 
   const app = client(server);
 
