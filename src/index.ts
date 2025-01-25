@@ -64,7 +64,7 @@ export type Router<
     /**
      * Register a function that validate every request
      */
-    use: (fn: MiddlewareFn<State>) => Router<State, Routes, SubRouters>,
+    use: <Set extends AnyState = {}>(fn: MiddlewareFn<Set | (Set & State)>) => Router<State & Set, Routes, SubRouters>,
 
     /**
      * Add response headers
@@ -94,6 +94,8 @@ export type MiddlewareFn<State extends AnyState> = (...args: [
   next: () => MaybePromise<Response>, Context & State
 ]) => MaybePromise<Response>;
 export type AnyMiddlewareFn = MiddlewareFn<AnyState>;
+
+export const defineMiddleware = <Set extends AnyState = {}>(f: MiddlewareFn<Set>): MiddlewareFn<Set> => f as any;
 
 // Implementation
 const initRoute = (method: string | null) => function (this: AnyRouter, path: string, b: any): any {

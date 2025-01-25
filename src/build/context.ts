@@ -12,7 +12,7 @@ export default class GenericContext {
     this.headers = [];
   }
 
-  public body(body: any, status: any): Response {
+  public send(body: any, status: any): Response {
     if (typeof status === 'number')
       this.status = status;
     return new Response(body, this);

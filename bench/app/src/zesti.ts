@@ -9,7 +9,7 @@ for (const path in pathMap) {
   // @ts-expect-error Nvm
   app.get(path.replace(/\/:\w+/g, '/*'), path.includes(':')
     ? (params: string[], c: any) => c.body(fn(params[0]))
-    : (c) => c.body(fn())
+    : (c) => c.send(fn())
   );
 }
 

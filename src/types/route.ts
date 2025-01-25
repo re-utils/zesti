@@ -1,4 +1,4 @@
-import type { AwaitedReturn, ConcatPath, MaybePromise, PickIfExists } from './utils.js';
+import type { AwaitedReturn, ConcatPath, LastItem, MaybePromise, PickIfExists } from './utils.js';
 
 export interface TypedResponse<T, S extends number> extends Response {
   text: () => Promise<T extends string ? T : T extends null ? '' : string>;
@@ -16,9 +16,9 @@ export interface Context {
   status: number;
   statusText?: string;
 
-  body: ResponseFn<BodyInit | null>;
+  send: ResponseFn<BodyInit | null>;
   json: ResponseFn<{}>;
-  html: Context['body'];
+  html: Context['send'];
 }
 
 export type Handler<State, Args extends any[] = []> = (...args: [...Args, Context & State]) => MaybePromise<Response | null | undefined>;
@@ -28,11 +28,9 @@ export type AnyHandler = Handler<any, [any]> | Handler<any>;
 export type HandlerData = [method: string | null, path: string, fn: AnyHandler, hasParam: boolean];
 
 // Client API
-export type InferHandlerRequestInit<T, Path extends string> =
-  (T extends Handler<infer State, any>
-    ? PickIfExists<State, 'body' | 'query'>
-    : {}
-  ) & (Path extends `${string}*${string}`
+export type InferHandlerRequestInit<T extends AnyHandler, Path extends string> =
+  PickIfExists<Exclude<LastItem<Parameters<T>>, keyof Context>, 'body' | 'query'>
+  & (Path extends `${string}*${string}`
     ? { params: [string | number, ...(string | number)[]] }
     : {}
   );
