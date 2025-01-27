@@ -61,7 +61,7 @@ Zesti works on every runtime by default.
 
 You can access runtime-specific properties using adapters:
 ```ts
-import { router, buildAdapter } from 'zesti/adapter/bun';
+import router, { buildAdapter } from 'zesti/adapter/bun';
 import build from 'zesti/build/fast';
 
 const app = router()
@@ -82,7 +82,7 @@ Runtimes with an adapter includes:
 
 With Cloudflare, you need to use `lazyBuild` from the adapter package.
 ```ts
-import { router, lazyBuild, buildAdapter } from 'zesti/adapter/cloudflare';
+import router, { lazyBuild, buildAdapter } from 'zesti/adapter/cloudflare';
 import build from 'zesti/build/fast';
 
 const app = router()
