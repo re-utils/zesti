@@ -20,18 +20,31 @@ export default {
 ```
 
 ## Speed
-Zesti is the fastest, compared to other Edge web frameworks.
+Zesti is the fastest, compared to other Cloudflare Workers frameworks.
 
-- clk: ~1.55 GHz
-- cpu: Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz
-- runtime: node 22.13.1 (x64-linux)
+```
+clk: ~0.36 GHz
+cpu: Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz
+runtime: node 22.13.1 (x64-linux)
 
-| benchmark |              avg |         min |         p75 |         p99 |         max |
-| ------ | ---------------- | ----------- | ----------- | ----------- | ----------- |
-| H3     | `11.31 ms/iter` | `9.19 ms` | `11.46 ms` | `14.79 ms` | `15.37 ms` |
-| Hono   | `7.42 ms/iter` | `5.72 ms` | `8.15 ms` | `8.86 ms` | `9.25 ms` |
-| Zesti  | `5.99 ms/iter` | `5.26 ms` | `6.29 ms` | `6.89 ms` | `7.32 ms` |
-| Elysia | `6.90 ms/iter` | `5.53 ms` | `7.35 ms` | `7.93 ms` | `7.97 ms` |
+benchmark                   avg (min … max) p75 / p99    (min … top 1%)
+------------------------------------------- -------------------------------
+H3                            46.73 ms/iter  50.41 ms        █
+                      (27.68 ms … 63.58 ms)  61.44 ms ▅      █▅ ▅▅▅▅ ▅    ▅
+                    (  1.97 gb …   6.62 gb)   4.46 gb █▁▁▁▁▁▁██▁████▁█▁▁▁▁█
+Hono                          19.62 ms/iter  23.85 ms ███          ▂ █
+                      (13.72 ms … 28.83 ms)  27.65 ms ███▅        ▅█▅█ ▅
+                    (  3.81 gb …   6.21 gb)   5.19 gb ████▇▁▁▇▁▁▁▁████▇█▁▁▇
+Zesti                         17.19 ms/iter  22.93 ms █
+                      (12.81 ms … 26.40 ms)  25.95 ms █▃
+                    (  3.75 gb …   3.78 gb)   3.75 gb ██▅▃▃▅▁▃▁▁▁▃▁▃▁▅▅█▃▁▃
+
+                             ┌                                            ┐
+                          H3 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 46.73 ms
+                        Hono ┤■■■ 19.62 ms
+                       Zesti ┤ 17.19 ms
+                             └                                            ┘
+```
 
 This benchmark measures the time for each framework to handle 1,000 request objects.
 You can run the benchmark by cloning the reposity and run:
