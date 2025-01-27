@@ -1,18 +1,10 @@
 /// <reference types="@cloudflare/workers-types" />
 import router, { type Router } from '..';
+
 import type { BuildAdapter, BuildFn, FetchFn } from '../build/types';
-import GenericContext from '../build/context';
+import type { Context } from '../types/route';
 
-export class CloudflareContext extends GenericContext {
-  public env: InitState['env'];
-  public ctx: InitState['ctx'];
-
-  public constructor(req: Request, env: InitState['env'], ctx: InitState['ctx']) {
-    super(req);
-    this.env = env;
-    this.ctx = ctx;
-  }
-}
+import context from '../build/context';
 
 export interface InitState {
   // @ts-expect-error User should provide the type
@@ -27,7 +19,13 @@ export interface LazyBuildResult {
   fetch: FetchFn<FetchArgs>;
 }
 
-export const buildAdapter: BuildAdapter<InitState, FetchArgs> = (r, e, c) => new CloudflareContext(r, e, c) as any;
+export const buildAdapter: BuildAdapter<InitState, FetchArgs> = (r, e, c) => {
+  const k: Context & InitState = Object.create(context);
+  k.req = r;
+  k.env = e;
+  k.ctx = c;
+  return k;
+};
 
 export const lazyBuild = <T extends ExportedHandler<InitState['env']>>(fn: () => ReturnType<BuildFn>, o: T = {} as T): LazyBuildResult & T => {
   // eslint-disable-next-line

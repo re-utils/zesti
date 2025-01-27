@@ -6,7 +6,7 @@ import type { AnyMiddlewareFn, AnyRouter, SubrouterData } from '../..';
 import type { Context, HandlerData } from '../../types/route';
 
 import { matcher } from './route';
-import GenericContext from '../context';
+import context from '../context';
 
 type RouteTree = [Record<string, BaseRouter<AnyFn>>, BaseRouter<AnyFn> | null];
 
@@ -80,7 +80,10 @@ export default ((router, adapter) => {
       const s = u.indexOf('/', 12) + 1;
       const e = u.indexOf('?', s);
 
-      return (routeMap.get(r.method) ?? fallback)(e === -1 ? u.slice(s) : u.substring(s, e), new GenericContext(r) as Context);
+      const c: Context = Object.create(context);
+      c.req = r;
+
+      return (routeMap.get(r.method) ?? fallback)(e === -1 ? u.slice(s) : u.substring(s, e), c);
     };
   }
 

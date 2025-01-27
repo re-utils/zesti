@@ -10,7 +10,11 @@ export const pathMap = {
 } satisfies Record<string, (...params: string[]) => string>;
 
 export const paths = Object.keys(pathMap);
-export const requests = Array.from({ length: 1000 }, (_, i) => new Request('http://127.0.0.1' + paths[i % paths.length]));
+export const requests = Array.from({ length: 1000 }, (_, i) =>
+  i % 50 === 0
+    ? new Request('http://127.0.0.1/nonexistentpath/deep/' + i)
+    : new Request('http://127.0.0.1' + paths[i % paths.length])
+);
 
 export const setupTests = async (label: string, assertEquals: (actual: any, expected: any) => any, obj: { fetch: Function }) => {
   const params = new Array(5).fill('' + Math.random());

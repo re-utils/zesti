@@ -11,5 +11,4 @@ for (const path in pathMap) {
   );
 }
 
-// Pls don't kill my TSC
 export default app as any;

@@ -27,11 +27,12 @@ const apps: [string, { fetch: FetchFn }][] = [
   plot(() => {
     for (const [name, obj] of apps) {
       requests.forEach((t: Request) => obj.fetch(t));
+      console.log(obj.fetch.toString())
 
       bench(name, () => {
         for (let i = 0; i < requests.length; i++)
           do_not_optimize(obj.fetch(requests[i]));
-      }).gc('inner');
+      });
     }
   });
 
