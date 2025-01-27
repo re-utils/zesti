@@ -59,7 +59,6 @@ export default tsEslint.config({
     "no-unsafe-optional-chaining": "error",
     "no-unused-private-class-members": "error",
     "no-useless-backreference": "error",
-    "require-atomic-updates": "error",
     "use-isnan": "error",
     "accessor-pairs": "error",
     "grouped-accessor-pairs": "error",

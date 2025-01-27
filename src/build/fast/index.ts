@@ -15,7 +15,7 @@ type ErrorSet = Map<symbol, ErrorHandlerData[1]>;
 export const handleErrors = (errSet: ErrorSet, err: AnyErrorValue, c: Context): any => {
   const fn = errSet.get(err[0]);
   return typeof fn === 'undefined'
-    ? c.send('Uncaught error', 400)
+    ? c.send(null, 400)
     : err.length === 2
       ? fn(err[1], c)
       // @ts-expect-error Error is static here
