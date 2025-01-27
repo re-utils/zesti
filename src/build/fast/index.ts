@@ -4,45 +4,75 @@ import type { AnyFn } from '../../types/utils';
 import type { BuildFn } from '../types';
 import type { AnyMiddlewareFn, AnyRouter, SubrouterData } from '../..';
 import type { Context, HandlerData } from '../../types/route';
+import type { AnyErrorValue, ErrorHandlerData } from '../../error';
 
 import { matcher } from './route';
 import context from '../context';
 
 type RouteTree = [Record<string, BaseRouter<AnyFn>>, BaseRouter<AnyFn> | null];
+type ErrorSet = Map<symbol, ErrorHandlerData[1]>;
 
-const build = (router: AnyRouter, routesTree: RouteTree, cbs: AnyMiddlewareFn[], prefix: string): void => {
-  const mds = [...cbs, ...router.m];
+export const handleErrors = (errSet: ErrorSet, err: AnyErrorValue, c: Context): any => {
+  const fn = errSet.get(err[0]);
+  return typeof fn === 'undefined'
+    ? c.send('Uncaught error', 400)
+    : err.length === 2
+      ? fn(err[1], c)
+      // @ts-expect-error Error is static here
+      : fn(c);
+};
+
+export type State = [routesTree: RouteTree, cbs: AnyMiddlewareFn[], errs: ErrorHandlerData[]];
+
+const build = (router: AnyRouter, state: State, prefix: string, errSet: ErrorSet): void => {
+  // Only change middleware when necessary
+  let mds = state[1];
+  if (router.m.length !== 0)
+    mds = state[1] = [...state[1], ...router.m];
   const mdsLen = mds.length;
+
+  // Only change error set when necessary
+  if (router.e.length !== 0) {
+    state[2] = [...state[2], ...router.e];
+    errSet = new Map(state[2]);
+  }
 
   for (let i = 0, x: HandlerData, routes = router.r; i < routes.length; i++) {
     x = routes[i];
 
     const f = x[2];
     insertItem(
-      // @ts-expect-error Hey
       x[0] === null
         // @ts-expect-error Hey
+        // eslint-disable-next-line
         ? routesTree[1] ??= createRouter()
         // @ts-expect-error Hey
+        // eslint-disable-next-line
         : routesTree[0][x[0]] ??= createRouter(),
 
       prefix + x[1],
+
+      // @ts-expect-error Hey
       mds.length === 0
         ? f
         : x[3]
           ? (p: string[], c: Context) => {
             let idx = 0;
-            const next = (): any => idx < mdsLen
-              ? mds[idx++](next, c)
-              : f(p, c);
+            const next = (e?: any): any => typeof e === 'undefined'
+              ? idx < mdsLen
+                ? mds[idx++](next, c)
+                : f(p, c)
+              : handleErrors(errSet, e, c);
             return next();
           }
           : (c: Context) => {
             let idx = 0;
-            const next = (): any => idx < mdsLen
-              ? mds[idx++](next, c)
-              // @ts-expect-error Only 1 arg
-              : f(c);
+            const next = (e?: any): any => typeof e === 'undefined'
+              ? idx < mdsLen
+                ? mds[idx++](next, c)
+                // @ts-expect-error Only one argument here
+                : f(c)
+              : handleErrors(errSet, e, c);
             return next();
           }
     );
@@ -50,7 +80,7 @@ const build = (router: AnyRouter, routesTree: RouteTree, cbs: AnyMiddlewareFn[],
 
   for (let i = 0, x: SubrouterData, routes = router.s; i < routes.length; i++) {
     x = routes[i];
-    build(x[1], routesTree, mds, x[0] === '/' ? prefix : prefix + x[0]);
+    build(x[1], state, x[0] === '/' ? prefix : prefix + x[0], errSet);
   }
 };
 
@@ -59,7 +89,7 @@ const build = (router: AnyRouter, routesTree: RouteTree, cbs: AnyMiddlewareFn[],
  */
 export default ((router, adapter) => {
   const routes: RouteTree = [ {}, null];
-  build(router, routes, [], '');
+  build(router, [routes, [], []], '', new Map());
 
   // This doesn't work with Cloudflare if you put it in the global scope
   const nf = new Response(null, { status: 404 });
@@ -81,6 +111,7 @@ export default ((router, adapter) => {
       const e = u.indexOf('?', s);
 
       const c: Context = Object.create(context);
+      c.headers = [];
       c.req = r;
 
       return (routeMap.get(r.method) ?? fallback)(e === -1 ? u.slice(s) : u.substring(s, e), c);

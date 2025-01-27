@@ -1,5 +1,6 @@
+import type { AnyError, DynamicError, DynamicErrorHandler, ErrorHandlerData, StaticError } from './error';
 import type { Handler, HandlerData, Context } from './types/route';
-import type { MaybePromise } from './types/utils';
+import type { AwaitedReturn, MaybePromise } from './types/utils';
 
 // Types
 export type Methods = typeof methods[number];
@@ -8,11 +9,14 @@ export type InferParams<Path extends string> = Path extends `${string}*${infer R
   ? Rest extends '*' ? [string] : [string, ...InferParams<Rest>]
   : [];
 
+export type SubrouterData = [string, AnyRouter];
+
 export type RouteRegister<
   Method extends string | null,
   State extends AnyState,
   Routes extends HandlerData[],
-  SubRouters extends [string, AnyRouter][]
+  SubRouters extends SubrouterData[],
+  ErrorResponse extends Response
 > = <
   const Path extends string,
   const T extends (InferParams<Path>['length'] extends 0
@@ -22,24 +26,29 @@ export type RouteRegister<
 >(path: Path, handler: T) => Router<
   State,
   [...Routes, [Method, Path, T, InferParams<Path>['length'] extends 0 ? false : true]],
-  SubRouters
+  SubRouters,
+  ErrorResponse
 >;
-
-export type SubrouterData = [string, AnyRouter];
 
 export type Router<
   State extends AnyState = {},
   Routes extends HandlerData[] = [],
-  SubRouters extends SubrouterData[] = []
-> = { [Method in Methods]: RouteRegister<Uppercase<Method>, State, Routes, SubRouters> }
+  SubRouters extends SubrouterData[] = [],
+  ErrorResponse extends Response = never
+> = { [Method in Methods]: RouteRegister<Uppercase<Method>, State, Routes, SubRouters, ErrorResponse> }
   & {
     /**
      * Type of the current state
      */
     stateType: State,
 
+    /**
+     * Return type of error handlers
+     */
+    errorType: ErrorResponse,
+
     // Weird stuff
-    any: RouteRegister<null, State, Routes, SubRouters>,
+    any: RouteRegister<null, State, Routes, SubRouters, ErrorResponse>,
 
     // Custom stuff
     insert: <
@@ -51,25 +60,35 @@ export type Router<
     >(method: Method, path: Path, handler: T) => Router<
       State,
       [...Routes, [Method, Path, T, InferParams<Path>['length'] extends 0 ? false : true]],
-      SubRouters
+      SubRouters,
+      ErrorResponse
     >,
 
     /**
      * Register a subrouter
      */
     route: <const Path extends string, const SubRouter extends AnyRouter>(path: string, subrouter: SubRouter) => Router<
-      State, Routes, [...SubRouters, [Path, SubRouter]]
+      State, Routes, [...SubRouters, [Path, SubRouter]], ErrorResponse
     >,
 
     /**
      * Register a function that validate every request
      */
-    use: <Set extends AnyState = {}>(fn: MiddlewareFn<Set | (Set & State)>) => Router<State & Set, Routes, SubRouters>,
+    use: <Set extends AnyState = {}>(fn: MiddlewareFn<Set & State>) => Router<State & Set, Routes, SubRouters, ErrorResponse>,
 
     /**
      * Add response headers
      */
-    headers: (headers: HeadersInit) => Router<State, Routes, SubRouters>,
+    headers: (headers: HeadersInit) => Router<State, Routes, SubRouters, ErrorResponse>,
+
+    /**
+     * Register an error handler
+     */
+    error:
+      // Static error
+      (<const Fn extends Handler<State>>(err: StaticError, fn: Fn) => Router<State, Routes, SubRouters, ErrorResponse | Extract<AwaitedReturn<Fn>, Response>>)
+      // Dynamic error
+      | (<const T, const Fn extends DynamicErrorHandler<T>>(err: DynamicError<T>, fn: Fn) => Router<State, Routes, SubRouters, ErrorResponse | Extract<AwaitedReturn<Fn>, Response>>),
 
     /**
      * All routes
@@ -84,11 +103,16 @@ export type Router<
     /**
      * All middlewares
      */
-    m: AnyMiddlewareFn[]
+    m: AnyMiddlewareFn[],
+
+    /**
+     * All error handlers
+     */
+    e: ErrorHandlerData[]
   };
 
 export type AnyState = Record<string, any>;
-export type AnyRouter = Router<AnyState, HandlerData[], SubrouterData[]>;
+export type AnyRouter = Router<AnyState, HandlerData[], SubrouterData[], any>;
 
 export type MiddlewareFn<State extends AnyState> = (...args: [
   next: () => MaybePromise<Response>, Context & State
@@ -142,9 +166,26 @@ const registers: Router = {
     return this;
   },
 
-  r: [],
-  m: [],
-  s: []
+  error(this: AnyRouter, err: AnyError, fn: any) {
+    this.e.push([Array.isArray(err) ? err[0] : err.i, fn]);
+    return this;
+  },
+
+  r: null,
+  m: null,
+  s: null,
+  e: null
 } as any;
 
-export default (): Router => Object.create(registers);
+export default (): Router => {
+  const o = Object.create(registers);
+  // eslint-disable-next-line
+  o.r = [];
+  // eslint-disable-next-line
+  o.m = [];
+  // eslint-disable-next-line
+  o.s = [];
+  // eslint-disable-next-line
+  o.e = [];
+  return o;
+};

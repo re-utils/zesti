@@ -5,7 +5,7 @@ const json = ['content-type', 'application/json'];
 
 export default {
   status: 200,
-  headers: [],
+  headers: null as any as [string, string][],
   req: null as any as Request,
 
   send(body: any, status: any): Response {

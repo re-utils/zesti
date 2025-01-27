@@ -21,6 +21,7 @@ export interface LazyBuildResult {
 
 export const buildAdapter: BuildAdapter<InitState, FetchArgs> = (r, e, c) => {
   const k: Context & InitState = Object.create(context);
+  k.headers = [];
   k.req = r;
   k.env = e;
   k.ctx = c;

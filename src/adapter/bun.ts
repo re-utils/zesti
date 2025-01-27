@@ -14,6 +14,7 @@ export interface InitState {
 export default router as () => Router<InitState>;
 export const buildAdapter: BuildAdapter<InitState, [server: InitState['server']]> = (r, s) => {
   const c: Context & InitState = Object.create(context);
+  c.headers = [];
   c.req = r;
   c.server = s;
   return c;

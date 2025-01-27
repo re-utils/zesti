@@ -35,9 +35,9 @@ export type InferHandlerRequestInit<T extends AnyHandler, Path extends string> =
     : {}
   );
 
-export type InferHandlerRPC<T extends HandlerData, Prefix extends string> = Record<
+export type InferHandlerRPC<T extends HandlerData, ErrorResponse extends Response, Prefix extends string> = Record<
   null extends T[0] ? '$' : Lowercase<T[0] & {}>,
   keyof InferHandlerRequestInit<T[2], T[1]> extends never
-    ? (path: ConcatPath<Prefix, T[1]>, init?: RequestInit) => Promise<AwaitedReturn<T[2]>>
-    : (path: ConcatPath<Prefix, T[1]>, init: InferHandlerRequestInit<T[2], T[1]> & RequestInit) => Promise<AwaitedReturn<T[2]>>
+    ? (path: ConcatPath<Prefix, T[1]>, init?: RequestInit) => Promise<AwaitedReturn<T[2]> | ErrorResponse>
+    : (path: ConcatPath<Prefix, T[1]>, init: InferHandlerRequestInit<T[2], T[1]> & RequestInit) => Promise<AwaitedReturn<T[2]> | ErrorResponse>
 >;
