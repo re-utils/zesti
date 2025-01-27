@@ -37,22 +37,19 @@ const build = (router: AnyRouter, state: State, prefix: string, errSet: ErrorSet
     errSet = new Map(state[2]);
   }
 
-  for (let i = 0, x: HandlerData, routes = router.r; i < routes.length; i++) {
+  for (let i = 0, x: HandlerData, routes = router.r, tree = state[0]; i < routes.length; i++) {
     x = routes[i];
 
     const f = x[2];
     insertItem(
+      // @ts-expect-error Hey
       x[0] === null
         // @ts-expect-error Hey
-        // eslint-disable-next-line
-        ? routesTree[1] ??= createRouter()
+        ? tree[1] ??= createRouter()
         // @ts-expect-error Hey
-        // eslint-disable-next-line
-        : routesTree[0][x[0]] ??= createRouter(),
+        : tree[0][x[0]] ??= createRouter(),
 
       prefix + x[1],
-
-      // @ts-expect-error Hey
       mds.length === 0
         ? f
         : x[3]
