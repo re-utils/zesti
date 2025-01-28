@@ -1,4 +1,5 @@
-import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
+import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import { SiDiscord, SiGithub, SiNpm } from "@icons-pack/react-simple-icons";
 
 /**
  * Shared layout configurations
@@ -9,14 +10,34 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
  */
 export const baseOptions: BaseLayoutProps = {
   nav: {
-    // can be JSX too!
-    title: 'My App',
+    title: "Zesti",
   },
   links: [
     {
-      text: 'Documentation',
-      url: '/docs',
-      active: 'nested-url',
+      text: "Docs",
+      url: "/docs",
+      active: "nested-url",
+    },
+    {
+      type: "icon",
+      url: "https://github.com/re-utils/zesti",
+      text: "Github",
+      icon: <SiGithub />,
+      external: true,
+    },
+    {
+      type: "icon",
+      url: "https://www.npmjs.com/package/zesti",
+      text: "npm",
+      icon: <SiNpm />,
+      external: true,
+    },
+    {
+      type: "icon",
+      url: "https://discord.gg/eUFHe33Pre",
+      text: "Discord",
+      icon: <SiDiscord />,
+      external: true,
     },
   ],
 };
