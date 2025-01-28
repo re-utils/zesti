@@ -33,10 +33,12 @@ describe('Match route', () => {
 });
 
 describe('Body parsing', () => {
-  const parseBody = defineMiddleware<{ body: string }>(async (next, c) => {
-    c.body = await c.req.text();
-    return next();
-  });
+  const parseBody = defineMiddleware<{ body: string }>(
+    async (next, c) => {
+      c.body = await c.req.text();
+      return next();
+    }
+  );
 
   const server = router()
     .use(parseBody)
