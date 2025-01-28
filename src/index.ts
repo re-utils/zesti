@@ -84,11 +84,16 @@ export type Router<
     /**
      * Register an error handler
      */
-    error:
+    catch:
       // Static error
       (<const Fn extends Handler<State>>(err: StaticError, fn: Fn) => Router<State, Routes, SubRouters, ErrorResponse | Extract<AwaitedReturn<Fn>, Response>>)
       // Dynamic error
       | (<const T, const Fn extends DynamicErrorHandler<T>>(err: DynamicError<T>, fn: Fn) => Router<State, Routes, SubRouters, ErrorResponse | Extract<AwaitedReturn<Fn>, Response>>),
+
+    /**
+     * Handles all error
+     */
+    catchAll: <const Fn extends Handler<State>>(fn: Fn) => Router<State, Routes, SubRouters, ErrorResponse | Extract<AwaitedReturn<Fn>, Response>>,
 
     /**
      * All routes
@@ -108,7 +113,12 @@ export type Router<
     /**
      * All error handlers
      */
-    e: ErrorHandlerData[]
+    e: ErrorHandlerData[],
+
+    /**
+     * Fallback error handler
+     */
+    f: ErrorHandlerData[1] | null
   };
 
 export type AnyState = Record<string, any>;
@@ -166,15 +176,21 @@ const registers: Router = {
     return this;
   },
 
-  error(this: AnyRouter, err: AnyError, fn: any) {
+  catch(this: AnyRouter, err: AnyError, fn: any) {
     this.e.push([Array.isArray(err) ? err[0] : err.i, fn]);
+    return this;
+  },
+
+  catchAll(this: AnyRouter, fn: any) {
+    this.f = fn;
     return this;
   },
 
   r: null,
   m: null,
   s: null,
-  e: null
+  e: null,
+  f: null
 } as any;
 
 export default (): Router => {

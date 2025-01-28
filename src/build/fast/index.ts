@@ -12,32 +12,65 @@ import context from '../context';
 type RouteTree = [Record<string, BaseRouter<AnyFn>>, BaseRouter<AnyFn> | null];
 type ErrorSet = Map<symbol, ErrorHandlerData[1]>;
 
-export const handleErrors = (errSet: ErrorSet, err: AnyErrorValue, c: Context): any => {
+export const handleErrors = (errSet: ErrorSet, fallback: ErrorHandlerData[1], err: AnyErrorValue, c: Context): any => {
   const fn = errSet.get(err[0]);
   return typeof fn === 'undefined'
-    ? c.send(null, 400)
+    // @ts-expect-error Error is static here
+    ? fallback(c)
     : err.length === 2
       ? fn(err[1], c)
       // @ts-expect-error Error is static here
       : fn(c);
 };
 
-export type State = [routesTree: RouteTree, cbs: AnyMiddlewareFn[], errs: ErrorHandlerData[]];
+export type State = [routesTree: RouteTree, cbs: AnyMiddlewareFn[], errs: ErrorHandlerData[], allErrFn: ErrorHandlerData[1]];
 
 const build = (router: AnyRouter, state: State, prefix: string, errSet: ErrorSet): void => {
+  let copied = false;
+
   // Only change middleware when necessary
-  let mds = state[1];
-  if (router.m.length !== 0)
-    mds = state[1] = [...state[1], ...router.m];
-  const mdsLen = mds.length;
+  if (router.m.length !== 0) {
+    copied = true;
+    state = state.with(1, [...state[1], ...router.m]) as State;
+  }
 
   // Only change error set when necessary
   if (router.e.length !== 0) {
-    state[2] = [...state[2], ...router.e];
-    errSet = new Map(state[2]);
+    if (!copied) {
+      state = state.with(2, state[2]) as State;
+      copied = true;
+    }
+
+    errSet = new Map(state[2] = [...state[2], ...router.e]);
   }
 
-  for (let i = 0, x: HandlerData, routes = router.r, tree = state[0]; i < routes.length; i++) {
+  // Set new fallback error handler
+  if (router.f !== null) {
+    if (copied)
+      state[3] = router.f;
+    else
+      state = state.with(3, router.f) as State;
+  }
+
+  for (
+    let i = 0,
+      // Current route
+      x: HandlerData,
+      routes = router.r,
+
+      // Route tree
+      tree = state[0],
+
+      // Middleware
+      mds = state[1],
+      mdsLen = mds.length,
+
+      // Fallback error callback
+      errFallback = state[3];
+
+    i < routes.length;
+    i++
+  ) {
     x = routes[i];
 
     const f = x[2];
@@ -59,7 +92,7 @@ const build = (router: AnyRouter, state: State, prefix: string, errSet: ErrorSet
               ? idx < mdsLen
                 ? mds[idx++](next, c)
                 : f(p, c)
-              : handleErrors(errSet, e, c);
+              : handleErrors(errSet, errFallback, e, c);
             return next();
           }
           : (c: Context) => {
@@ -69,7 +102,7 @@ const build = (router: AnyRouter, state: State, prefix: string, errSet: ErrorSet
                 ? mds[idx++](next, c)
                 // @ts-expect-error Only one argument here
                 : f(c)
-              : handleErrors(errSet, e, c);
+              : handleErrors(errSet, errFallback, e, c);
             return next();
           }
     );
@@ -85,11 +118,12 @@ const build = (router: AnyRouter, state: State, prefix: string, errSet: ErrorSet
  * Build to the fastest handler
  */
 export default ((router, adapter) => {
-  const routes: RouteTree = [ {}, null];
-  build(router, [routes, [], []], '', new Map());
-
   // This doesn't work with Cloudflare if you put it in the global scope
   const nf = new Response(null, { status: 404 });
+  const badReq = new Response(null, { status: 400 });
+
+  const routes: RouteTree = [ {}, null];
+  build(router, [routes, [], [], () => badReq], '', new Map());
 
   // Fallback method
   const fallback = routes[1] === null
