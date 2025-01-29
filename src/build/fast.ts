@@ -1,27 +1,17 @@
 import { createRouter, insertItem, type Router as BaseRouter } from '@mapl/router';
 
-import type { AnyFn } from '../../types/utils';
-import type { BuildFn } from '../types';
-import type { AnyMiddlewareFn, AnyRouter, SubrouterData } from '../..';
-import type { Context, HandlerData } from '../../types/route';
-import type { AnyErrorValue, ErrorHandlerData } from '../../error';
+import type { AnyFn } from '../types/utils';
+import type { BuildFn } from './types';
+import type { AnyMiddlewareFn, AnyRouter, SubrouterData } from '..';
+import type { Context, HandlerData } from '../types/route';
+import type { ErrorHandlerData } from '../error';
 
-import { matcher } from './route';
-import context from '../context';
+import { createMatcher } from './utils';
+import context from './context';
+
+import { handleErrors, type ErrorSet } from './utils';
 
 type RouteTree = [Record<string, BaseRouter<AnyFn>>, BaseRouter<AnyFn> | null];
-type ErrorSet = Map<symbol, ErrorHandlerData[1]>;
-
-export const handleErrors = (errSet: ErrorSet, fallback: ErrorHandlerData[1], err: AnyErrorValue, c: Context): any => {
-  const fn = errSet.get(err[0]);
-  return typeof fn === 'undefined'
-    // @ts-expect-error Error is static here
-    ? fallback(c)
-    : err.length === 2
-      ? fn(err[1], c)
-      // @ts-expect-error Error is static here
-      : fn(c);
-};
 
 export type State = [routesTree: RouteTree, cbs: AnyMiddlewareFn[], errs: ErrorHandlerData[], allErrFn: ErrorHandlerData[1]];
 
@@ -128,11 +118,11 @@ export default ((router, adapter) => {
   // Fallback method
   const fallback = routes[1] === null
     ? () => nf
-    : matcher(routes[1], () => nf);
+    : createMatcher(routes[1], () => nf);
 
   // Build for registered methods
   const routeMap = new Map(Object.entries(routes[0])
-    .map((pair) => [pair[0], matcher(pair[1], fallback)]));
+    .map((pair) => [pair[0], createMatcher(pair[1], fallback)]));
 
   // No adapter provided
   if (adapter == null) {
