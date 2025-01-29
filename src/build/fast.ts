@@ -1,4 +1,5 @@
 import { createRouter, insertItem, type Router as BaseRouter } from '@mapl/router';
+import match from '@mapl/router/tree/matcher';
 
 import type { AnyFn } from '../types/utils';
 import type { BuildFn } from './types';
@@ -6,16 +7,32 @@ import type { AnyMiddlewareFn, AnyRouter, SubrouterData } from '..';
 import type { Context, HandlerData } from '../types/route';
 import type { ErrorHandlerData } from '../error';
 
-import { createMatcher } from './utils';
 import context from './context';
-
 import { handleErrors, type ErrorSet } from './utils';
 
 type RouteTree = [Record<string, BaseRouter<AnyFn>>, BaseRouter<AnyFn> | null];
+type State = [routesTree: RouteTree, cbs: AnyMiddlewareFn[], errs: ErrorHandlerData[], allErrFn: ErrorHandlerData[1]];
 
-export type State = [routesTree: RouteTree, cbs: AnyMiddlewareFn[], errs: ErrorHandlerData[], allErrFn: ErrorHandlerData[1]];
+/**
+ * Create a matcher
+ */
+export const createMatcher = (router: BaseRouter<AnyFn>, nf: (...args: any[]) => Response): (p: string, r: Context) => any => {
+  // Slice the first slash out
+  const map = new Map(router[0].map((pair) => [pair[0].slice(1), pair[1]]));
+  const node = router[1];
 
-const build = (router: AnyRouter, state: State, prefix: string, errSet: ErrorSet): void => {
+  if (node !== null) {
+    const oldNf = nf;
+    nf = (p: string, c: Context) => {
+      const params: string[] = [];
+      return (match(node, p, params, -1) as AnyFn | null)?.(params, c) ?? oldNf(p, c);
+    };
+  }
+
+  return (p: string, c: Context) => map.get(p)?.(c) ?? nf(p, c);
+};
+
+export const build = (router: AnyRouter, state: State, prefix: string, errSet: ErrorSet): void => {
   let copied = false;
 
   // Only change middleware when necessary
