@@ -2,13 +2,13 @@ import { barplot as plot, run, bench, do_not_optimize } from 'mitata';
 import assert from 'node:assert';
 
 // Apps
-import h3 from './src/h3';
-import hono from './src/hono';
-import zesti from './src/zesti';
+import { serve as h3 } from './src/h3';
+import { serve as hono } from './src/hono';
+import { serve as zesti } from './src/zesti';
 
 // Zesti has types for these stuff
 import type { FetchFn } from 'zesti/build/types';
-import { requests, setupTests } from './reqs';
+import { requests, setupTests } from '../reqs';
 import { defaultConfig } from '@lib';
 
 const apps: [string, { fetch: FetchFn }][] = [

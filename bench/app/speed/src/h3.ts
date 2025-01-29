@@ -14,7 +14,7 @@ for (const path in pathMap) {
 const app = createApp().use(router);
 const fetch = toWebHandler(app);
 
-export default {
+export const serve = {
   fetch: (req: any, env: any, ctx: any) => fetch(req, {
     cloudflare: { env, ctx }
   })

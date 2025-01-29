@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { pathMap } from '../reqs';
+import { pathMap } from '../../reqs';
 import { RegExpRouter } from "hono/router/reg-exp-router";
 
 const app = new Hono({ router: new RegExpRouter() });
@@ -12,4 +12,4 @@ for (const path in pathMap) {
   );
 }
 
-export default app;
+export const serve = app;

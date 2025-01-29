@@ -1,6 +1,6 @@
-import router, { lazyBuild } from 'zesti/adapter/cloudflare';
+import router, { lazyBuild, buildAdapter } from 'zesti/adapter/cloudflare';
 import build from 'zesti/build/fast';
-import { pathMap } from '../reqs';
+import { pathMap } from '../../reqs';
 
 const app = router();
 
@@ -14,4 +14,4 @@ for (const path in pathMap) {
   );
 }
 
-export default lazyBuild(() => build(app));
+export const serve = lazyBuild(() => build(app, buildAdapter));
