@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'bun:test';
 
-import router, { defineMiddleware } from 'zesti';
+import router, { fn } from 'zesti';
 import client from 'zesti/client/test';
 
 describe('Match route', () => {
@@ -33,7 +33,7 @@ describe('Match route', () => {
 });
 
 describe('Body parsing', () => {
-  const parseBody = defineMiddleware<{ body: string }>(
+  const parseBody = fn<{ body: string }>(
     async (next, c) => {
       c.body = await c.req.text();
       return next();

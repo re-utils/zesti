@@ -129,7 +129,7 @@ export type MiddlewareFn<State extends AnyState> = (...args: [
 ]) => MaybePromise<Response>;
 export type AnyMiddlewareFn = MiddlewareFn<AnyState>;
 
-export const defineMiddleware = <Set extends AnyState = {}>(f: MiddlewareFn<Set>): MiddlewareFn<Set> => f as any;
+export const fn = <Set extends AnyState = {}>(f: MiddlewareFn<Set>): MiddlewareFn<Set> => f as any;
 
 // Implementation
 const initRoute = (method: string | null) => function (this: AnyRouter, path: string, b: any): any {
@@ -176,13 +176,13 @@ const registers: Router = {
     return this;
   },
 
-  catch(this: AnyRouter, err: AnyError, fn: any) {
-    this.e.push([Array.isArray(err) ? err[0] : err.i, fn]);
+  catch(this: AnyRouter, err: AnyError, f: any) {
+    this.e.push([Array.isArray(err) ? err[0] : err.i, f]);
     return this;
   },
 
-  catchAll(this: AnyRouter, fn: any) {
-    this.f = fn;
+  catchAll(this: AnyRouter, f: any) {
+    this.f = f;
     return this;
   },
 
