@@ -8,7 +8,6 @@ const OUTDIR = DIR + '.out/';
 const args = process.argv;
 const config = {
   emit: false,
-  format: 'mitata',
   runtime: 'bun'
 }
 
@@ -29,9 +28,9 @@ const run = async (path: string) => {
     await Bun.write(target, '\0');
     await Bun.write(target, '');
 
-    await exec`${getExec()} ${path} ${config.format} > ${Bun.file(target)}`;
+    await exec`${getExec()} ${path} > ${Bun.file(target)}`;
   } else
-    await exec`${getExec()} ${path} ${config.format}`;
+    await exec`${getExec()} ${path}`;
 }
 
 {
@@ -49,12 +48,6 @@ const run = async (path: string) => {
     fs.mkdirSync(OUTDIR);
 
     config.emit = true;
-    args.splice(idx, 1);
-  }
-
-  idx = args.indexOf('--markdown');
-  if (idx !== -1) {
-    config.format = 'markdown';
     args.splice(idx, 1);
   }
 }
