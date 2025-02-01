@@ -27,5 +27,5 @@ for (let name of new Bun.Glob('*').scanSync({
 
   writer.write(`\n## ${info.name}\n${info.description}\n\n### Details\n${info.details.map((detail) => `- ${detail}\n`).join('')}\n### Results\n\`\`\`\n`);
   writer.write((await Bun.$`bun run ./app/${name}/index.ts ${args}`).stdout);
-  writer.write('\n```\n');
+  writer.write('```\n');
 }
