@@ -14,7 +14,7 @@ const toByte = (num: number) =>
     : num + 'B';
 
 for await (const path of new Bun.Glob('**/*.js').scan(LIB)) {
-  const file = Bun.file(LIB + path);
+  const file = Bun.file(`${LIB}/${path}`);
 
   const stat = await file.stat();
   if (!stat.isFile()) continue;
