@@ -1,5 +1,5 @@
 {
   "name": "Speed",
-  "description": "Measure each framework response time to 1000 in-memory Request object with CORS middleware",
+  "description": "Measure each framework response time to 1000 in-memory Request object with a CORS middleware.",
   "details": ["Using Hono fastest preset", "Using Zesti fastest preset"]
 }

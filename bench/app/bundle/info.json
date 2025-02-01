@@ -1,6 +1,6 @@
 {
   "name": "Bundle size",
-  "description": "Measure framework bundle sizes for a simple app",
+  "description": "Measure each framework bundle size for a simple app.",
   "details": [
     "Using Hono smallest preset",
     "Using itty-router smallest router",
