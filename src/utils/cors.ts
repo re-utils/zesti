@@ -1,4 +1,5 @@
 import type { MiddlewareFn } from '..';
+import loadHeaders from './headers';
 
 type HeaderValue = '*' | (string & {}) | [string, string, ...string[]];
 
@@ -29,11 +30,8 @@ export default (origins: HeaderValue, options?: Options): MiddlewareFn => {
     if (Array.isArray(origins)) {
       // eslint-disable-next-line
       return (next, c) => {
-        const url = c.req.url;
-
-        const origin = url.substring(0, url.indexOf('/', 12));
+        const origin = c.req.url.substring(0, c.req.url.indexOf('/', 12));
         c.headers.push(['Access-Control-Allow-Origin', origins.includes(origin) ? origin : origins[0]], ...headers);
-
         return next();
       };
     }
@@ -41,11 +39,5 @@ export default (origins: HeaderValue, options?: Options): MiddlewareFn => {
 
   // Decide right away
   headers.push(['Access-Control-Allow-Origin', origins]);
-
-  // Simple headers
-  // eslint-disable-next-line
-  return (next, c) => {
-    c.headers.push(...headers);
-    return next();
-  };
+  return loadHeaders(headers);
 };
