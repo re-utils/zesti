@@ -77,11 +77,6 @@ export type Router<
     use: <Set extends AnyState = {}>(fn: MiddlewareFn<Set & State>) => Router<State & Set, Routes, SubRouters, ErrorResponse>,
 
     /**
-     * Add response headers
-     */
-    headers: (headers: HeadersInit) => Router<State, Routes, SubRouters, ErrorResponse>,
-
-    /**
      * Register an error handler
      */
     catch:
@@ -124,7 +119,7 @@ export type Router<
 export type AnyState = Record<string, any>;
 export type AnyRouter = Router<AnyState, HandlerData[], SubrouterData[], any>;
 
-export type MiddlewareFn<State extends AnyState> = (...args: [
+export type MiddlewareFn<State extends AnyState = {}> = (...args: [
   next: () => MaybePromise<Response>, Context & State
 ]) => MaybePromise<Response>;
 export type AnyMiddlewareFn = MiddlewareFn<AnyState>;
@@ -150,21 +145,6 @@ const registers: Router = {
 
   use(this: AnyRouter, ...fns: AnyMiddlewareFn[]) {
     this.m.push(...fns);
-    return this;
-  },
-
-  headers(this: AnyRouter, headers: any) {
-    if (!Array.isArray(headers)) {
-      headers = headers instanceof Headers
-        ? headers.entries().toArray()
-        : Object.entries(headers);
-    }
-
-    this.m.push(async (next, c) => {
-      c.headers.push(...headers);
-      return next();
-    });
-
     return this;
   },
 
