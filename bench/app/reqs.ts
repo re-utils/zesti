@@ -41,5 +41,5 @@ export const setupTests = async (label: string, assertEquals: (actual: any, expe
     assertEquals(res.headers.get('Access-Control-Allow-Origin'), '*');
   }
 
-  console.log(obj.fetch.toString());
+  //console.log(obj.fetch.toString());
 };

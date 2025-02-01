@@ -3,7 +3,7 @@ const SRC = import.meta.dir + '/src/';
 let str = 'export default async () => <[name: string, { fetch: (r: any) => any }][]>[\n';
 for (const name of new Bun.Glob('*.ts').scanSync(SRC))
   if (name !== 'index.ts')
-    str += `  [${JSON.stringify(name)}, (await import(${JSON.stringify(SRC + name.substring(0, name.lastIndexOf('.')))})).serve],\n`;
+    str += `  [${JSON.stringify(name.substring(0, name.lastIndexOf('.')))}, (await import(${JSON.stringify(SRC + name)})).serve],\n`;
 str += ']';
 
 await Bun.write(SRC + 'index.ts', str);
