@@ -3,7 +3,10 @@ import build from 'zesti/build/fast';
 import cors from 'zesti/utils/cors';
 import { pathMap } from '../../reqs';
 
-const app = router().use(cors('*'));
+const app = router()
+  .use(cors('*', {
+    allowMethods: 'GET'
+  }));
 
 for (const path in pathMap) {
   const fn: any = pathMap[path as keyof typeof pathMap];

@@ -1,7 +1,5 @@
 {
   "dependencies": {
-    "elysia": "^1.2.10",
-    "h3": "^1.13.1",
     "hono": "^4.6.17",
     "itty-router": "^5.0.18"
   }

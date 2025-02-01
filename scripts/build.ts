@@ -1,17 +1,16 @@
 /// <reference types='bun-types' />
 import { existsSync, rmSync } from 'node:fs';
-import { resolve, join } from 'node:path/posix';
+import { resolve } from 'node:path/posix';
 
 import { transpileDeclaration } from 'typescript';
 import tsconfig from '../tsconfig.json';
+import { LIB, ROOT } from './utils';
 
 // Constants
-const ROOTDIR = resolve(import.meta.dir, '..');
-const SOURCEDIR = `${ROOTDIR}/src`;
-const OUTDIR = join(ROOTDIR, tsconfig.compilerOptions.declarationDir);
+const SOURCEDIR = `${ROOT}/src`;
 
 // Remove old content
-if (existsSync(OUTDIR)) rmSync(OUTDIR, { recursive: true });
+if (existsSync(LIB)) rmSync(LIB, { recursive: true });
 
 // Transpile files concurrently
 const transpiler = new Bun.Transpiler({
@@ -27,7 +26,7 @@ for (const path of new Bun.Glob('**/*.ts').scanSync(SOURCEDIR)) {
   const srcPath = `${SOURCEDIR}/${path}`;
 
   const pathExtStart = path.lastIndexOf('.');
-  const outPathNoExt = `${OUTDIR}/${path.substring(0, pathExtStart >>> 0)}`;
+  const outPathNoExt = `${LIB}/${path.substring(0, pathExtStart >>> 0)}`;
 
   Bun.file(srcPath)
     .text()

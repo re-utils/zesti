@@ -1,0 +1,8 @@
+{
+  "name": "Startup time",
+  "description": "Measure framework startup time",
+  "details": [
+    "Using Hono fastest-to-start preset",
+    "Using Zesti slowest-to-start preset"
+  ]
+}

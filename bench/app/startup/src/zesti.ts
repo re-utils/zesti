@@ -1,17 +1,12 @@
 import router, { lazyBuild, buildAdapter } from 'zesti/adapter/cloudflare';
 import build from 'zesti/build/fast';
-import { pathMap } from '../../reqs';
 
 const app = router();
 
-for (const path in pathMap) {
-  const fn: any = pathMap[path as keyof typeof pathMap];
+for (let i = 0; i < 50; i++)
+  app.get('/' + i, (c) => c.send('Hi'));
 
-  // @ts-expect-error Nvm
-  app.get(path.replace(/\/:\w+/g, '/*'), path.includes(':')
-    ? (params: string[], c: any) => c.send(fn(params[0]))
-    : (c) => c.send(fn())
-  );
-}
+for (let i = 0; i < 20; i++)
+  app.get(`/*/${i}`, (params, c) => c.send(params[0]));
 
 export const serve = lazyBuild(() => build(app, buildAdapter));

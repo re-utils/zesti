@@ -1,6 +1,6 @@
 {
   "name": "zesti",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A small and fast Edge framework",
   "keywords": [],
   "license": "MIT",
@@ -15,7 +15,7 @@
   "scripts": {
     "task": "bun scripts/task.ts",
     "build:test": "bun task build && bun test",
-    "build:publish": "bun task build && bun task report-size && bun task publish",
+    "build:publish": "bun task build && bun task bench-app && bun task report-size && bun task publish",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix"
   },

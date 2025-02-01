@@ -1,6 +1,5 @@
 import { minify } from 'uglify-js';
-
-const DIR = import.meta.dir + '/../lib/';
+import { LIB } from './utils';
 
 const sizes: {
   entry: string,
@@ -14,8 +13,8 @@ const toByte = (num: number) =>
     ? (num / 1e3).toFixed(2) + 'KB'
     : num + 'B';
 
-for await (const path of new Bun.Glob('**/*.js').scan(DIR)) {
-  const file = Bun.file(DIR + path);
+for await (const path of new Bun.Glob('**/*.js').scan(LIB)) {
+  const file = Bun.file(LIB + path);
 
   const stat = await file.stat();
   if (!stat.isFile()) continue;

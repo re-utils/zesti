@@ -19,43 +19,6 @@ export default {
 };
 ```
 
-## Speed
-Zesti is the fastest, compared to other Cloudflare Workers frameworks.
-
-```
-clk: ~0.36 GHz
-cpu: Intel(R) Core(TM) i5-8250U CPU @ 1.60GHz
-runtime: node 22.13.1 (x64-linux)
-
-benchmark                   avg (min … max) p75 / p99    (min … top 1%)
-------------------------------------------- -------------------------------
-H3                            46.73 ms/iter  50.41 ms        █
-                      (27.68 ms … 63.58 ms)  61.44 ms ▅      █▅ ▅▅▅▅ ▅    ▅
-                    (  1.97 gb …   6.62 gb)   4.46 gb █▁▁▁▁▁▁██▁████▁█▁▁▁▁█
-Hono                          19.62 ms/iter  23.85 ms ███          ▂ █
-                      (13.72 ms … 28.83 ms)  27.65 ms ███▅        ▅█▅█ ▅
-                    (  3.81 gb …   6.21 gb)   5.19 gb ████▇▁▁▇▁▁▁▁████▇█▁▁▇
-Zesti                         17.19 ms/iter  22.93 ms █
-                      (12.81 ms … 26.40 ms)  25.95 ms █▃
-                    (  3.75 gb …   3.78 gb)   3.75 gb ██▅▃▃▅▁▃▁▁▁▃▁▃▁▅▅█▃▁▃
-
-                             ┌                                            ┐
-                          H3 ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 46.73 ms
-                        Hono ┤■■■ 19.62 ms
-                       Zesti ┤ 17.19 ms
-                             └                                            ┘
-```
-
-This benchmark measures the time for each framework to handle 1,000 request objects.
-You can run the benchmark by cloning the reposity and run:
-```sh
-# Require Bun for scripts
-bun task bench --node
-```
-
-## Size
-Zesti main module is under 1KB bytes minified, and the largest build preset is under 3KB minified. Other components are only bundled when necessary.
-
 ## Cross runtime
 Zesti works on every runtime by default.
 
@@ -155,4 +118,13 @@ import client from 'zesti/client/test';
 // No need to manually expose methods like the client
 // Use this to test your backend code
 const tester = client(app);
+```
+
+# Benchmarks
+These benchmarks are executed on every published version of Zesti.
+
+You can run the benchmark locally by cloning the repo and run:
+```sh
+# Require Bun and hyperfine
+bun task bench-app --node
 ```

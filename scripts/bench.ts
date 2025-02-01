@@ -1,9 +1,8 @@
 import { Glob } from 'bun';
 import fs from 'fs';
-import { exec } from './utils';
+import { BENCH, exec } from './utils';
 
-const DIR = import.meta.dir + '/../bench/';
-const OUTDIR = DIR + '.out/';
+const OUTDIR = BENCH + '.out/';
 
 const args = process.argv;
 const config = {
@@ -52,11 +51,11 @@ const run = async (path: string) => {
   }
 }
 
-Bun.$.cwd(DIR);
+Bun.$.cwd(BENCH);
 
 const exactBench = args[2];
 
 if (exactBench != null)
   await run(`${exactBench}.bench.ts`);
-else for (const path of new Glob('**/*.bench.ts').scanSync(DIR))
+else for (const path of new Glob('**/*.bench.ts').scanSync(BENCH))
   await run(path);
