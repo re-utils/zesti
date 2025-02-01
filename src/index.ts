@@ -30,6 +30,22 @@ export type RouteRegister<
   ErrorResponse
 >;
 
+export type Plugin<T> = (router: Router) => T;
+export type AnyPlugin = Plugin<any>;
+
+export type MergeRouter<
+  T extends AnyRouter,
+  State extends AnyState = {},
+  Routes extends HandlerData[] = [],
+  SubRouters extends SubrouterData[] = [],
+  ErrorResponse extends Response = never
+> = Router<
+  State & T['stateType'],
+  [...Routes, ...T['r']],
+  [...SubRouters, ...T['s']],
+  ErrorResponse | T['errorType']
+>;
+
 export type Router<
   State extends AnyState = {},
   Routes extends HandlerData[] = [],
@@ -75,6 +91,11 @@ export type Router<
      * Register a function that validate every request
      */
     use: <Set extends AnyState = {}>(fn: MiddlewareFn<Set & State>) => Router<State & Set, Routes, SubRouters, ErrorResponse>,
+
+    /**
+     * Load a plugin
+     */
+    load: <const T extends AnyPlugin>(p: T) => MergeRouter<ReturnType<T> extends AnyRouter ? ReturnType<T> : Router, State, Routes, SubRouters, ErrorResponse>,
 
     /**
      * Register an error handler
@@ -143,8 +164,13 @@ const registers: Router = {
     return this;
   },
 
-  use(this: AnyRouter, ...fns: AnyMiddlewareFn[]) {
-    this.m.push(...fns);
+  use(this: AnyRouter, f: AnyMiddlewareFn) {
+    this.m.push(f);
+    return this;
+  },
+
+  load(this: AnyRouter, p: AnyPlugin) {
+    p(this as Router);
     return this;
   },
 

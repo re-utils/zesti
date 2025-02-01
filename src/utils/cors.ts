@@ -1,6 +1,4 @@
 import type { MiddlewareFn } from '..';
-import loadHeaders from './headers';
-
 type HeaderValue = '*' | (string & {}) | [string, string, ...string[]];
 
 export interface Options {
@@ -12,15 +10,26 @@ export interface Options {
 }
 
 export default (origins: HeaderValue, options?: Options): MiddlewareFn => {
-  // Optimized for code size
-  const headers: [string, string][] = options == null
-    ? []
-    : Object.entries(options).map(([x, y]) => [
+  const headers: [string, string][] = [];
+  const preflightHeaders: [string, string][] = [];
+
+  if (options != null) {
+    if (options.allowHeaders != null)
       // eslint-disable-next-line
-      'Access-Control-' + x[0].toUpperCase() + x.slice(1).replace(/([a-z])([A-Z])/g, '$1-$2'),
+      preflightHeaders.push(['Access-Control-Allow-Headers', '' + options.allowHeaders]);
+    if (options.allowMethods != null)
       // eslint-disable-next-line
-      '' + y
-    ]);
+      preflightHeaders.push(['Access-Control-Allow-Methods', '' + options.allowMethods]);
+    if (options.maxAge != null)
+      // eslint-disable-next-line
+      preflightHeaders.push(['Access-Control-Max-Age', '' + options.maxAge]);
+
+    if (options.exposeHeaders != null)
+      // eslint-disable-next-line
+      headers.push(['Access-Control-Expose-Headers', '' + options.exposeHeaders]);
+    if (options.allowCredentials === true)
+      headers.push(['Access-Control-Allow-Credentials', 'true']);
+  }
 
   // When one specific or multiple origins are specified
   if (origins !== '*') {
@@ -28,16 +37,29 @@ export default (origins: HeaderValue, options?: Options): MiddlewareFn => {
 
     // Handle multiple origins
     if (Array.isArray(origins)) {
+      // Skip when not needed
       // eslint-disable-next-line
       return (next, c) => {
-        const origin = c.req.url.substring(0, c.req.url.indexOf('/', 12));
-        c.headers.push(['Access-Control-Allow-Origin', origins.includes(origin) ? origin : origins[0]], ...headers);
+        const origin = c.req.headers.get('Origin');
+        c.headers.push(['Access-Control-Allow-Origin', typeof origin === 'string' && origins.includes(origin) ? origin : origins[0]], ...headers);
+
+        if (c.req.method === 'OPTIONS')
+          c.headers.push(...preflightHeaders);
+
         return next();
       };
     }
   }
 
-  // Decide right away
   headers.push(['Access-Control-Allow-Origin', origins]);
-  return loadHeaders(headers);
+
+  // eslint-disable-next-line
+  return (next, c) => {
+    c.headers.push(...headers);
+
+    if (c.req.method === 'OPTIONS')
+      c.headers.push(...preflightHeaders);
+
+    return next();
+  };
 };

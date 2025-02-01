@@ -1,8 +1,9 @@
 import router, { lazyBuild, buildAdapter } from 'zesti/adapter/cloudflare';
 import build from 'zesti/build/fast';
+import cors from 'zesti/utils/cors';
 import { pathMap } from '../../reqs';
 
-const app = router();
+const app = router().use(cors('*'));
 
 for (const path in pathMap) {
   const fn: any = pathMap[path as keyof typeof pathMap];

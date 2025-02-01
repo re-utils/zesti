@@ -7,6 +7,7 @@ export default (headers: HeadersInit): MiddlewareFn => {
       : Object.entries(headers);
   }
 
+  // Optimization
   if (headers.length === 1) {
     headers = headers[0] as any;
 

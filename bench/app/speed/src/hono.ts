@@ -1,8 +1,10 @@
 import { Hono } from "hono";
 import { pathMap } from '../../reqs';
 import { RegExpRouter } from "hono/router/reg-exp-router";
+import { cors } from "hono/cors";
 
-const app = new Hono({ router: new RegExpRouter() });
+const app = new Hono({ router: new RegExpRouter() }).use(cors());
+console.log(cors().toString())
 
 for (const path in pathMap) {
   const fn: any = pathMap[path as keyof typeof pathMap];
