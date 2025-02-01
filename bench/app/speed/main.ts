@@ -2,20 +2,32 @@ import { barplot as plot, run, bench, do_not_optimize } from 'mitata';
 import assert from 'node:assert';
 
 // Apps
-import { serve as hono } from './src/hono';
-import { serve as zesti } from './src/zesti';
+import loadApps from './src';
 
 // Zesti has types for these stuff
-import type { FetchFn } from 'zesti/build/types';
 import { requests, setupTests } from '../reqs';
 import { defaultConfig } from '@lib';
 
-const apps: [string, { fetch: FetchFn }][] = [
-  ['Hono', hono],
-  ['Zesti', zesti]
-];
+// const block = (globalName: keyof typeof globalThis) => {
+//   const x = globalThis[globalName];
+//   // @ts-ignore
+//   globalThis[globalName] = new Proxy(x, {
+//     apply() {
+//       throw new Error('Cannot use this');
+//     },
+//     construct() {
+//       throw new Error('Cannot use this');
+//     }
+//   });
+// }
+
+// // Block this
+// block('Function');
+// block('eval');
 
 (async () => {
+  const apps = await loadApps();
+
   for (const [name, obj] of apps)
     await setupTests(name, assert.strictEqual, obj);
 

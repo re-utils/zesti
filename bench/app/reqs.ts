@@ -17,6 +17,7 @@ export const requests = Array.from({ length: 1000 }, (_, i) =>
 );
 
 export const setupTests = async (label: string, assertEquals: (actual: any, expected: any) => any, obj: { fetch: Function }) => {
+  console.log('Testing', label);
   const params = new Array(5).fill('' + Math.random());
   //console.log('Testing', label);
 
@@ -27,7 +28,7 @@ export const setupTests = async (label: string, assertEquals: (actual: any, expe
     //console.log('* Match path', '"' + exactPath + '"', 'with', '"' + path + '"');
 
     // Response
-    const res = await obj.fetch(
+    const res: Response = await obj.fetch(
       new Request('http://127.0.0.1' + exactPath)
     );
 
@@ -36,5 +37,9 @@ export const setupTests = async (label: string, assertEquals: (actual: any, expe
       pathMap[path as keyof typeof pathMap](...params),
       await res.text()
     );
+
+    assertEquals(res.headers.get('Access-Control-Allow-Origin'), '*');
   }
+
+  console.log(obj.fetch.toString());
 };
