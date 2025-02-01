@@ -2,7 +2,7 @@
   "name": "Startup time",
   "description": "Measure each framework startup time with 100 simple static routes and 25 simple dynamic routes.",
   "details": [
-    "Using Hono fastest-to-start preset",
-    "Using Zesti slowest-to-start preset"
+    "Using Hono fastest-to-start preset.",
+    "Using Zesti slowest-to-start preset."
   ]
 }
