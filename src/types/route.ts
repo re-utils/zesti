@@ -1,12 +1,14 @@
-import type { AwaitedReturn, ConcatPath, LastItem, MaybePromise, PickIfExists } from './utils.js';
+import type { AwaitedReturn, ConcatPath, MaybePromise } from './utils.js';
 
-export interface TypedResponse<T, S extends number> extends Response {
+export interface TextResponse<T, S extends number> extends Response {
   text: () => Promise<T extends string ? T : T extends null ? '' : string>;
-  json: () => Promise<T extends string ? `"${T}"` : T>;
   status: S extends -1 ? number : S;
 }
 
-export type ResponseFn<Input> = <T extends Input, S extends number = -1>(body: T, status?: S) => TypedResponse<T, S>;
+export interface JSONResponse<T, S extends number> extends Response {
+  json: () => Promise<T extends string ? `"${T}"` : T>;
+  status: S extends -1 ? number : S;
+}
 
 export interface Context {
   req: Request;
@@ -16,8 +18,8 @@ export interface Context {
   status: number;
   statusText?: string;
 
-  send: ResponseFn<BodyInit | null>;
-  json: ResponseFn<{}>;
+  send: <T extends BodyInit | null, S extends number = -1>(body: T, status?: S) => TextResponse<T, S>;
+  json: <T extends {}, S extends number = -1>(body: T, status?: S) => JSONResponse<T, S>;
   html: Context['send'];
 }
 
@@ -28,16 +30,14 @@ export type AnyHandler = Handler<any, [any]> | Handler<any>;
 export type HandlerData = [method: string | null, path: string, fn: AnyHandler, hasParam: boolean];
 
 // Client API
-export type InferHandlerRequestInit<T extends AnyHandler, Path extends string> =
-  PickIfExists<Exclude<LastItem<Parameters<T>>, keyof Context>, 'body' | 'query'>
-  & (Path extends `${string}*${string}`
-    ? { params: [string | number, ...(string | number)[]] }
-    : {}
+export type InferHandlerRequestInit<T extends HandlerData, State> = State & (T[3] extends true
+  ? { params: [string | number, ...(string | number)[]] }
+  : {}
   );
 
-export type InferHandlerRPC<T extends HandlerData, ErrorResponse extends Response, Prefix extends string> = Record<
+export type InferHandlerRPC<T extends HandlerData, State, ErrorResponse extends Response, Prefix extends string> = Record<
   null extends T[0] ? '$' : Lowercase<T[0] & {}>,
-  keyof InferHandlerRequestInit<T[2], T[1]> extends never
+  keyof InferHandlerRequestInit<T, State> extends never
     ? (path: ConcatPath<Prefix, T[1]>, init?: RequestInit) => Promise<AwaitedReturn<T[2]> | ErrorResponse>
-    : (path: ConcatPath<Prefix, T[1]>, init: InferHandlerRequestInit<T[2], T[1]> & RequestInit) => Promise<AwaitedReturn<T[2]> | ErrorResponse>
+    : (path: ConcatPath<Prefix, T[1]>, init: InferHandlerRequestInit<T, State> & RequestInit) => Promise<AwaitedReturn<T[2]> | ErrorResponse>
 >;

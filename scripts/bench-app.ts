@@ -7,8 +7,8 @@ const writer = targetFile.writer();
 
 writer.write(await Bun.file(`${ROOT}/README.md`).arrayBuffer());
 
-Bun.$.cwd(BENCH);
 const BENCH_APP = BENCH + '/app/';
+Bun.$.cwd(BENCH_APP);
 
 for (let name of new Bun.Glob('*').scanSync({
   onlyFiles: false,
@@ -26,6 +26,6 @@ for (let name of new Bun.Glob('*').scanSync({
   console.log('Running', name);
 
   writer.write(`\n## ${info.name}\n${info.description}\n\n### Details\n${info.details.map((detail) => `- ${detail}\n`).join('')}\n### Results\n\`\`\`\n`);
-  writer.write((await Bun.$`bun run ./app/${name}/index.ts ${args}`).stdout);
+  writer.write((await Bun.$`bun run ${name}/index.ts ${args}`).stdout);
   writer.write('```\n');
 }

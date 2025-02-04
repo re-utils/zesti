@@ -83,7 +83,7 @@ export type Router<
     /**
      * Register a subrouter
      */
-    route: <const Path extends string, const SubRouter extends AnyRouter>(path: string, subrouter: SubRouter) => Router<
+    route: <const Path extends string, const SubRouter extends AnyRouter>(path: Path, subrouter: SubRouter) => Router<
       State, Routes, [...SubRouters, [Path, SubRouter]], ErrorResponse
     >,
 
