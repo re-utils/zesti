@@ -1,0 +1,9 @@
+{
+  "name": "Client type performance",
+  "description": "Measure type performance of framework type-safe clients.",
+  "details": [
+    "Using Hono 'hc' client.",
+    "Using Zesti client.",
+    "Using Elysia Eden Treaty client."
+  ]
+}
