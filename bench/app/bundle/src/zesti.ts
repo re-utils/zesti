@@ -1,5 +1,5 @@
 import router, { lazyBuild, buildAdapter } from 'zesti/adapter/cloudflare';
-import build from 'zesti/build/fast';
+import build from 'zesti/build/quick';
 import { pathMap } from '../../reqs';
 
 const app = router();

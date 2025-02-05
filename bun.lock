@@ -4,7 +4,7 @@
     "": {
       "name": "zesti",
       "dependencies": {
-        "@mapl/router": "^0.3.4",
+        "@mapl/router": "0.3.5",
       },
       "devDependencies": {
         "0x": "^5.8.0",
@@ -102,7 +102,7 @@
 
     "@humanwhocodes/retry": ["@humanwhocodes/retry@0.4.1", "", {}, "sha512-c7hNEllBlenFTHBky65mhq8WD2kbN9Q6gk0bTk8lSBvc554jpXSkST1iePudpt7+A/AQvuHs9EMqjHDXMY1lrA=="],
 
-    "@mapl/router": ["@mapl/router@0.3.4", "", {}, "sha512-N6perNdhWx/cw8yDJvCxeaU2EpnmS68vg/gUc8CtqK1AyBohbuxOOkbg92kAD01TsJ/99zQorIWUFEKXbgjt0Q=="],
+    "@mapl/router": ["@mapl/router@0.3.5", "", {}, "sha512-nSCe3PUJNT5S386EbI5gnAavYh3lPi1WexJXK5GSlzHnVy8ef+rD75IM4NjLRM1goncL9vIvApXgovMTnCEc2w=="],
 
     "@nodelib/fs.scandir": ["@nodelib/fs.scandir@2.1.5", "", { "dependencies": { "@nodelib/fs.stat": "2.0.5", "run-parallel": "^1.1.9" } }, "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g=="],
 

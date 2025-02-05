@@ -1,5 +1,5 @@
 import client, { type ClientOptions } from '.';
-import build from '../build/fast';
+import build from '../build/quick';
 
 import type { AnyRouter } from '..';
 import type { Client } from './types';
@@ -23,5 +23,5 @@ export default <T extends AnyRouter>(router: T, options?: Partial<ClientOptions>
   const methods: any[] = [];
   scanMethods(methods, router);
 
-  return client<T>('http://127.0.0.1:3000', methods, options);
+  return client<T>('http://127.0.0.1', methods, options);
 };

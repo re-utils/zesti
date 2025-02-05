@@ -133,7 +133,7 @@ export default ((router, adapter) => {
   build(router, [routes, [], [], () => badReq], '', new Map());
 
   // Fallback method
-  const fallback = routes[1] === null
+  const fallback = routes[1] == null
     ? () => nf
     : createMatcher(routes[1], () => nf);
 

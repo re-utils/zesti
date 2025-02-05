@@ -101,7 +101,7 @@ export const build = (router: AnyRouter, state: State, prefix: string, errSet: E
       let idx = 0;
       const c: Context = args[args.length - 1];
 
-      const next = (e?: any): any => typeof e === 'undefined'
+      const next = (e?: any): any => e == null
         ? idx < mdsLen
           ? mds[idx++](next, c)
           : f(...args)
@@ -127,7 +127,7 @@ export default ((router, adapter) => {
   build(router, [routes, [], [], () => new Response(null, { status: 400 })], '', new Map());
 
   // Fallback method
-  const fallback = routes[1] === null
+  const fallback = routes[1] == null
     ? () => nf
     : createMatcher(routes[1], () => nf);
 
