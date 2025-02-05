@@ -1,5 +1,4 @@
-import { createRouter, insertItem, type Router as BaseRouter } from '@mapl/router';
-import match from '@mapl/router/tree/matcher';
+import match from '@mapl/router/quick-match';
 
 import type { AnyFn } from '../types/utils';
 import type { BuildFn } from './types';
@@ -10,26 +9,29 @@ import type { ErrorHandlerData } from '../error';
 import context from './context';
 import { handleErrors, type ErrorSet } from './utils';
 
-type RouteTree = [Record<string, BaseRouter<AnyFn>>, BaseRouter<AnyFn> | null];
+type BaseRouter = [staticRoutes: string[], val: AnyFn[], dynamicRoutes: string[], val: AnyFn[]];
+type RouteTree = [Record<string, BaseRouter>, BaseRouter | null];
 type State = [routesTree: RouteTree, cbs: AnyMiddlewareFn[], errs: ErrorHandlerData[], allErrFn: ErrorHandlerData[1]];
 
 /**
  * Create a matcher
  */
-export const createMatcher = (router: BaseRouter<AnyFn>, nf: (...args: any[]) => Response): (p: string, r: Context) => any => {
-  // Slice the first slash out
-  const map = new Map(router[0].map((pair) => [pair[0].slice(1), pair[1]]));
-  const node = router[1];
+export const createMatcher = (router: BaseRouter, nf: (...args: any[]) => Response): (p: string, r: Context) => any => {
+  const [staticList, staticVal, dynList, dynVal] = router;
 
-  if (node !== null) {
-    const oldNf = nf;
-    nf = (p: string, c: Context) => {
-      const params: string[] = [];
-      return (match(node, p, params, -1) as AnyFn | null)?.(params, c) ?? oldNf(p, c);
-    };
-  }
+  return (p: string, c: Context) => {
+    let i = staticList.indexOf(p);
+    if (i !== -1) return staticVal[i](c);
 
-  return (p: string, c: Context) => map.get(p)?.(c) ?? nf(p, c);
+    let tmp: string[] | null;
+    for (i = 0; i < dynList.length; i++) {
+      tmp = match(dynList[i], p);
+      if (tmp !== null)
+        return dynVal[i](tmp, c);
+    }
+
+    return nf(p, c);
+  };
 };
 
 export const build = (router: AnyRouter, state: State, prefix: string, errSet: ErrorSet): void => {
@@ -61,9 +63,12 @@ export const build = (router: AnyRouter, state: State, prefix: string, errSet: E
 
   for (
     let i = 0,
+      tmp: 0 | 2,
+
       // Current route
       x: HandlerData,
       routes = router.r,
+      targetRouter: BaseRouter,
 
       // Route tree
       tree = state[0],
@@ -79,40 +84,30 @@ export const build = (router: AnyRouter, state: State, prefix: string, errSet: E
     i++
   ) {
     x = routes[i];
-
     const f = x[2];
-    insertItem(
-      // @ts-expect-error Hey
-      x[0] === null
-        // @ts-expect-error Hey
-        ? tree[1] ??= createRouter()
-        // @ts-expect-error Hey
-        : tree[0][x[0]] ??= createRouter(),
 
-      prefix + x[1],
-      mds.length === 0
-        ? f
-        : x[3]
-          ? (p: string[], c: Context) => {
-            let idx = 0;
-            const next = (e?: any): any => typeof e === 'undefined'
-              ? idx < mdsLen
-                ? mds[idx++](next, c)
-                : f(p, c)
-              : handleErrors(errSet, errFallback, e, c);
-            return next();
-          }
-          : (c: Context) => {
-            let idx = 0;
-            const next = (e?: any): any => typeof e === 'undefined'
-              ? idx < mdsLen
-                ? mds[idx++](next, c)
-                // @ts-expect-error Only one argument here
-                : f(c)
-              : handleErrors(errSet, errFallback, e, c);
-            return next();
-          }
-    );
+    // Decide the router to push in
+    targetRouter = x[0] === null
+      ? tree[1] ??= [[], [], [], []]
+      : tree[0][x[0]] ??= [[], [], [], []];
+
+    // Decide the store to push in
+    tmp = x[3] ? 2 : 0;
+
+    // Push the path and the handler
+    targetRouter[tmp].push(prefix + x[1]);
+
+    (targetRouter[tmp + 1] as AnyFn[]).push((...args: [any, any]) => {
+      let idx = 0;
+      const c: Context = args[args.length - 1];
+
+      const next = (e?: any): any => typeof e === 'undefined'
+        ? idx < mdsLen
+          ? mds[idx++](next, c)
+          : f(...args)
+        : handleErrors(errSet, errFallback, e, c);
+      return next();
+    });
   }
 
   for (let i = 0, x: SubrouterData, routes = router.s; i < routes.length; i++) {
@@ -127,10 +122,9 @@ export const build = (router: AnyRouter, state: State, prefix: string, errSet: E
 export default ((router, adapter) => {
   // This doesn't work with Cloudflare if you put it in the global scope
   const nf = new Response(null, { status: 404 });
-  const badReq = new Response(null, { status: 400 });
 
   const routes: RouteTree = [ {}, null];
-  build(router, [routes, [], [], () => badReq], '', new Map());
+  build(router, [routes, [], [], () => new Response(null, { status: 400 })], '', new Map());
 
   // Fallback method
   const fallback = routes[1] === null
@@ -144,22 +138,12 @@ export default ((router, adapter) => {
   return adapter == null
     // No adapter provided
     ? (r) => {
-      const u = r.url;
-      const s = u.indexOf('/', 12) + 1;
-      const e = u.indexOf('?', s);
-
       const c: Context = Object.create(context);
       c.headers = [];
       c.req = r;
 
-      return (routeMap.get(r.method) ?? fallback)(e === -1 ? u.slice(s) : u.substring(s, e), c);
+      return (routeMap.get(r.method) ?? fallback)(new URL(r.url).pathname, c);
     }
     // Custom adapter
-    : (r, ...a: any[]) => {
-      const u = r.url;
-      const s = u.indexOf('/', 12) + 1;
-      const e = u.indexOf('?', s);
-
-      return (routeMap.get(r.method) ?? fallback)(e === -1 ? u.slice(s) : u.substring(s, e), adapter(r, ...a as any));
-    };
+    : (r, ...a: any[]) => (routeMap.get(r.method) ?? fallback)(new URL(r.url).pathname, adapter(r, ...a as any));
 }) as BuildFn;
