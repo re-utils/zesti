@@ -2,8 +2,8 @@
   "name": "Bundle size",
   "description": "Measure each framework bundle size for a simple app.",
   "details": [
-    "Using Hono smallest preset.",
-    "Using itty-router smallest router.",
-    "Using Zesti smallest preset."
+    "Using `hono/tiny` - smallest preset.",
+    "Using `itty-router` `IttyRouter` - smallest router.",
+    "Using `zesti/build/quick` - smallest preset."
   ]
 }

@@ -2,8 +2,8 @@
   "name": "Startup time",
   "description": "Measure each framework startup time with 100 simple static routes and 25 simple dynamic routes.",
   "details": [
-    "Using Hono fastest-to-start preset.",
-    "Using Zesti fastest-to-start preset.",
-    "Using @mapl/app most aggressive optimizing compiler."
+    "Using `hono/quick` - fastest-to-start preset",
+    "Using `zesti/build/quick` fastest-to-start preset.",
+    "Using `@mapl/app` `jitc` - most aggressive optimizing compiler."
   ]
 }
