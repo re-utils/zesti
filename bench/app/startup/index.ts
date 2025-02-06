@@ -7,4 +7,4 @@ const commands = Array.from(
 ).map((path) => `${exe} ${path}`);
 
 Bun.$.cwd(DIR);
-await Bun.$`hyperfine --shell=none --warmup=10 ${commands}`;
+await Bun.$`hyperfine --shell=none --warmup=10 --runs=50 ${commands}`;
