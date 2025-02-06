@@ -5,6 +5,7 @@
       "dependencies": {
         "@ark/attest": "^0.41.2",
         "@elysiajs/eden": "^1.2.0",
+        "@mapl/app": "^0.5.14",
         "elysia": "^1.2.11",
         "hono": "^4.6.17",
         "itty-router": "^5.0.18",
@@ -21,6 +22,12 @@
     "@ark/util": ["@ark/util@0.39.0", "", {}, "sha512-90APHVklk8BP4kku7hIh1BgrhuyKYqoZ4O7EybtFRo7cDl9mIyc/QUbGvYDg//73s0J2H0I/gW9pzroA1R4IBQ=="],
 
     "@elysiajs/eden": ["@elysiajs/eden@1.2.0", "", { "peerDependencies": { "elysia": ">= 1.2.0" } }, "sha512-MpV45ahuF+iFZUg4tyJbLr9qxzY99m8clJVgQrDrz7Qh6eOKQ8MY6vjYMj3Wh21pTIRHPHzOLhVorRGby1/Owg=="],
+
+    "@mapl/app": ["@mapl/app@0.5.14", "", { "dependencies": { "@mapl/compiler": "^0.2.2", "@mapl/router": "^0.3.3" } }, "sha512-c3kq7gwgmX/cMRqaF+ahfwQRyvw0yfqGjijgQRJ2CDrRjuNMJhlTHQu75APASEEc+wKABW9zSkvmg4EIvZOz3A=="],
+
+    "@mapl/compiler": ["@mapl/compiler@0.2.2", "", {}, "sha512-ImPckdoXO7o5/teVHfJhhmNJKcV9gtcyFhJ7B4dNvFOdjNHGY/hGmivBcfxc7xxx3N/Wd0xM5UhgsjxHRq5dFg=="],
+
+    "@mapl/router": ["@mapl/router@0.3.5", "", {}, "sha512-nSCe3PUJNT5S386EbI5gnAavYh3lPi1WexJXK5GSlzHnVy8ef+rD75IM4NjLRM1goncL9vIvApXgovMTnCEc2w=="],
 
     "@prettier/sync": ["@prettier/sync@0.5.2", "", { "dependencies": { "make-synchronized": "^0.2.8" }, "peerDependencies": { "prettier": "*" } }, "sha512-Yb569su456XNx5BsH/Vyem7xD6g/y9iLmLUzRKM1a/dhU/D7HqqvkAG72znulXlMXztbV0iiu9O5AL8K98TzZQ=="],
 

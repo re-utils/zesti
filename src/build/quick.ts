@@ -16,22 +16,18 @@ type State = [routesTree: RouteTree, cbs: AnyMiddlewareFn[], errs: ErrorHandlerD
 /**
  * Create a matcher
  */
-export const createMatcher = (router: BaseRouter, nf: (...args: any[]) => Response): (p: string, r: Context) => any => {
-  const [staticList, staticVal, dynList, dynVal] = router;
+export const createMatcher = (router: BaseRouter, nf: (...args: any[]) => Response): (p: string, r: Context) => any => (p, c) => {
+  let i = router[0].indexOf(p);
+  if (i !== -1) return router[1][i](c);
 
-  return (p: string, c: Context) => {
-    let i = staticList.indexOf(p);
-    if (i !== -1) return staticVal[i](c);
+  let tmp: string[] | null;
+  for (i = 0; i < router[2].length; i++) {
+    tmp = match(router[2][i], p);
+    if (tmp !== null)
+      return router[3][i](tmp, c);
+  }
 
-    let tmp: string[] | null;
-    for (i = 0; i < dynList.length; i++) {
-      tmp = match(dynList[i], p);
-      if (tmp !== null)
-        return dynVal[i](tmp, c);
-    }
-
-    return nf(p, c);
-  };
+  return nf(p, c);
 };
 
 export const build = (router: AnyRouter, state: State, prefix: string, errSet: ErrorSet): void => {
@@ -96,7 +92,6 @@ export const build = (router: AnyRouter, state: State, prefix: string, errSet: E
 
     // Push the path and the handler
     targetRouter[tmp].push(prefix + x[1]);
-
     (targetRouter[tmp + 1] as AnyFn[]).push((...args: [any, any]) => {
       let idx = 0;
       const c: Context = args[args.length - 1];
