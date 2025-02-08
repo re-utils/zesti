@@ -52,7 +52,6 @@ export default <
                 if (quality > q) {
                   q = quality;
                   tmpResult = value;
-                  continue parseParts;
                 }
               }
 
