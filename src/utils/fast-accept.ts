@@ -1,36 +1,5 @@
 import type { Context } from '../types/route';
 
-export type Accept = string | [string, Record<string, string>];
-
-// 0: Ignore
-// 1: Return immediately
-// Otherwise: Continue parsing
-const parseQualityPart = (requiredQuality: number, part: string, priority: number): number => {
-  // Match first number
-  switch (part.charCodeAt(2)) {
-    // Start with 0
-    case 48: {
-      // Quality is 0
-      if (part.length !== 3) {
-        // Quality check
-        const quality = +part.slice(3) * priority;
-        if (quality > requiredQuality)
-          return quality;
-      }
-
-      return 0;
-    }
-
-    // Start with 1
-    case 49:
-      return 1;
-
-    // Invalid weight
-    default:
-      return 0;
-  }
-};
-
 /**
  * Create a parser for other types of Accept header
  */
@@ -72,21 +41,29 @@ export default <
 
         qualityStr = parts[1].trim();
         if (qualityStr.startsWith('q=')) {
-          q = parseQualityPart(q, qualityStr, value === '*' ? 0.999 : 1);
+          // Match first number
+          switch (qualityStr.charCodeAt(2)) {
+            // Start with 0
+            case 48:
+              // Quality is valid
+              if (qualityStr.length !== 3 && qualityStr.length < 8) {
+                // Quality check
+                const quality = value === '*' ? 0.999 * +qualityStr.slice(3) : +qualityStr.slice(3);
+                if (quality > q) {
+                  q = quality;
+                  tmpResult = value;
+                  continue parseParts;
+                }
+              }
 
-          switch (q) {
-            // Does not satisfy quality constraint
-            case 0:
               continue parseParts;
 
-            // Always valid
-            case 1:
+            // Start with 1
+            case 49:
               return value;
 
-            // Need to check other values
+            // Invalid weight
             default:
-              // Save this result
-              tmpResult = value;
               continue parseParts;
           }
         }
