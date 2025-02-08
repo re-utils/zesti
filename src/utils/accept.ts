@@ -209,7 +209,7 @@ export const acceptContent = <
 /**
  * Create a parser for other types of Accept header
  */
-export const accept = <
+export default <
   T extends string[],
   D extends string | undefined = undefined
 >(
