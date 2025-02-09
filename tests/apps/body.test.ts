@@ -4,8 +4,9 @@ import router, { fn } from 'zesti';
 import client from 'zesti/client/test';
 
 import validator from 'zesti/utils/body/assert-json';
-import { build } from 'stnl/compilers/validate-json';
 import { invalidBodyFormat } from 'zesti/utils/body/error';
+
+import { build } from 'stnl/compilers/validate-json';
 
 describe('Body parsing', () => {
   const schema = build({
