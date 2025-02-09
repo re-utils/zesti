@@ -1,4 +1,4 @@
-import type { AwaitedReturn, ConcatPath, MaybePromise } from './utils.js';
+import type { MaybePromise } from './utils.js';
 
 export interface TextResponse<T, S extends number> extends Response {
   text: () => Promise<T extends string ? T : T extends null ? '' : string>;
@@ -28,16 +28,3 @@ export type AnyHandler = Handler<any, [any]> | Handler<any>;
 
 // null is for any handler
 export type HandlerData = [method: string | null, path: string, fn: AnyHandler, hasParam: boolean];
-
-// Client API
-export type InferHandlerRequestInit<T extends HandlerData, State> = State & (T[3] extends true
-  ? { params: [string | number, ...(string | number)[]] }
-  : {}
-  );
-
-export type InferHandlerRPC<T extends HandlerData, State, ErrorResponse extends Response, Prefix extends string> = Record<
-  null extends T[0] ? '$' : Lowercase<T[0] & {}>,
-  keyof InferHandlerRequestInit<T, State> extends never
-    ? (path: ConcatPath<Prefix, T[1]>, init?: RequestInit) => Promise<AwaitedReturn<T[2]> | ErrorResponse>
-    : (path: ConcatPath<Prefix, T[1]>, init: InferHandlerRequestInit<T, State> & RequestInit) => Promise<AwaitedReturn<T[2]> | ErrorResponse>
->;

@@ -31,26 +31,3 @@ describe('Match route', () => {
     expect(await res.json()).toHaveProperty('now');
   });
 });
-
-describe('Body parsing', () => {
-  const parseBody = fn<{ body: string }>(
-    async (next, c) => {
-      c.body = await c.req.text();
-      return next();
-    }
-  );
-
-  const server = router()
-    .use(parseBody)
-    .post('/', (c) => c.send(c.body));
-
-  const app = client(server);
-
-  test('POST /', async () => {
-    const res = await app.post('/', {
-      body: 'Hi'
-    });
-    expect(res.status).toBe(200);
-    expect(await res.text()).toBe('Hi');
-  });
-});

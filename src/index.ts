@@ -11,7 +11,7 @@ export type InferParams<Path extends string> = Path extends `${string}*${infer R
 
 export type SubrouterData = [string, AnyRouter];
 
-export type RouteRegister<
+type RouteRegister<
   Method extends string | null,
   State extends AnyState,
   Routes extends HandlerData[],
@@ -29,6 +29,30 @@ export type RouteRegister<
   SubRouters,
   ErrorResponse
 >;
+
+interface CatchSignature<
+  State extends AnyState,
+  Routes extends HandlerData[],
+  SubRouters extends SubrouterData[],
+  ErrorResponse extends Response
+> {
+  <const Fn extends Handler<State>>(
+    err: StaticError,
+    fn: Fn
+  ): Router<
+    State, Routes, SubRouters,
+    ErrorResponse | Extract<AwaitedReturn<Fn>, Response>
+  >;
+
+  // Dynamic error
+  <const T, const Fn extends DynamicErrorHandler<T, State>>(
+    err: DynamicError<T>,
+    fn: Fn
+  ): Router<
+    State, Routes, SubRouters,
+    ErrorResponse | Extract<AwaitedReturn<Fn>, Response>
+  >;
+}
 
 export type Plugin<T> = (router: Router) => T;
 export type AnyPlugin = Plugin<any>;
@@ -100,11 +124,7 @@ export type Router<
     /**
      * Register an error handler
      */
-    catch:
-      // Static error
-      (<const Fn extends Handler<State>>(err: StaticError, fn: Fn) => Router<State, Routes, SubRouters, ErrorResponse | Extract<AwaitedReturn<Fn>, Response>>)
-      // Dynamic error
-      | (<const T, const Fn extends DynamicErrorHandler<T>>(err: DynamicError<T>, fn: Fn) => Router<State, Routes, SubRouters, ErrorResponse | Extract<AwaitedReturn<Fn>, Response>>),
+    catch: CatchSignature<State, Routes, SubRouters, ErrorResponse>,
 
     /**
      * Handles all error
@@ -141,7 +161,7 @@ export type AnyState = Record<string, any>;
 export type AnyRouter = Router<AnyState, HandlerData[], SubrouterData[], any>;
 
 export type MiddlewareFn<State extends AnyState = {}> = (...args: [
-  next: () => MaybePromise<Response>, Context & State
+  next: (err?: AnyError) => MaybePromise<Response>, Context & State
 ]) => MaybePromise<Response>;
 export type AnyMiddlewareFn = MiddlewareFn<AnyState>;
 

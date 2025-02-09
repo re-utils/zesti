@@ -1,6 +1,21 @@
 import type { AnyRouter, SubrouterData } from '..';
-import type { HandlerData, InferHandlerRPC } from '../types/route';
-import type { ConcatPath, PickIfExists, UnionToIntersection } from '../types/utils';
+import type { HandlerData } from '../types/route';
+import type { AwaitedReturn, ConcatPath, PickIfExists, UnionToIntersection } from '../types/utils';
+
+// Client API
+export type InferHandlerRequestInit<T extends HandlerData, State> = State & (T[3] extends true
+  ? { params: [string | number, ...(string | number)[]] }
+  : {}
+  );
+
+export type ExcludedRequestInit = Omit<RequestInit, 'body' | 'query'>;
+
+export type InferHandlerRPC<T extends HandlerData, State, ErrorResponse extends Response, Prefix extends string> = Record<
+  null extends T[0] ? '$' : Lowercase<T[0] & {}>,
+  keyof InferHandlerRequestInit<T, State> extends never
+    ? (path: ConcatPath<Prefix, T[1]>, init?: RequestInit) => Promise<AwaitedReturn<T[2]> | ErrorResponse>
+    : (path: ConcatPath<Prefix, T[1]>, init: ExcludedRequestInit & InferHandlerRequestInit<T, State>) => Promise<AwaitedReturn<T[2]> | ErrorResponse>
+>;
 
 export type InferClient<
   T extends AnyRouter,

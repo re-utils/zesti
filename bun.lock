@@ -16,6 +16,7 @@
         "eslint": "latest",
         "eslint-plugin-jsdoc": "latest",
         "mitata": "^1.0.30",
+        "stnl": "^0.3.5",
         "tsx": "latest",
         "typescript": "latest",
         "typescript-eslint": "latest",
@@ -715,6 +716,8 @@
     "spdx-license-ids": ["spdx-license-ids@3.0.21", "", {}, "sha512-Bvg/8F5XephndSK3JffaRqdT+gyhfqIPwDHpX80tJrF8QQRYMo8sNMeaZ2Dp5+jhwKnUmIOyFFQfHRkjJm5nXg=="],
 
     "split2": ["split2@4.2.0", "", {}, "sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg=="],
+
+    "stnl": ["stnl@0.3.5", "", {}, "sha512-d5SozAjuuKqNQXleLIiLKrsnyL4Rm8FU28hmA/Ja/G/frzDMX66fodU09IUdWJhf1Xm+B1pG/KG/eQY4buiBoQ=="],
 
     "stream-browserify": ["stream-browserify@3.0.0", "", { "dependencies": { "inherits": "~2.0.4", "readable-stream": "^3.5.0" } }, "sha512-H73RAHsVBapbim0tU2JwwOiXUj+fikfiaoYAKHF3VJfA0pe2BCzkhAHBlLG6REzE+2WNZcxOXjK7lkso+9euLA=="],
 
