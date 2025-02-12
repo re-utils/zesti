@@ -1,5 +1,5 @@
-import type { MiddlewareFn } from '../..';
-import type { Context } from '../../types/route';
+import type { MiddlewareFn } from '..';
+import type { Context } from '../types/route';
 import { invalidBodyFormat } from './error';
 
 /**
@@ -21,7 +21,7 @@ export default <T>(
 ): MiddlewareFn<{ body: T }> => async (next, c) => {
   // eslint-disable-next-line
   const body = await c.req.json().catch(() => { });
-  if (typeof body !== 'undefined' && assert(body)) {
+  if (assert(body)) {
     c.body = body;
     return next();
   }

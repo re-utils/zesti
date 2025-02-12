@@ -1,10 +1,10 @@
 import { describe, test, expect } from 'bun:test';
 
-import router, { fn } from 'zesti';
+import router from 'zesti';
 import client from 'zesti/client/test';
 
-import validator from 'zesti/utils/body/assert-json';
-import { invalidBodyFormat } from 'zesti/utils/body/error';
+import validator from 'zesti/body/assert-json';
+import { invalidBodyFormat } from 'zesti/body/error';
 
 import { build } from 'stnl/compilers/validate-json';
 
