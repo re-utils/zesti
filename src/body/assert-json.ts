@@ -10,7 +10,7 @@ export const createValidator = <T>(
 ): (c: Context) => Promise<T | undefined> => async (c) => {
   // eslint-disable-next-line
   const body = await c.req.json().catch(() => { });
-  if (typeof body !== 'undefined' && assert(body)) return body;
+  if (assert(body)) return body;
 };
 
 /**

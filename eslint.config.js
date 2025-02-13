@@ -103,7 +103,6 @@ export default tsEslint.config({
     "prefer-regex-literals": "error",
     "prefer-rest-params": "error",
     "prefer-spread": "error",
-    "prefer-template": "warn",
     curly: ["error", "multi-or-nest"],
     eqeqeq: [
       "error",
@@ -190,9 +189,7 @@ export default tsEslint.config({
     "@typescript-eslint/prefer-reduce-type-parameter": "warn",
     "@typescript-eslint/prefer-regexp-exec": "warn",
     "@typescript-eslint/prefer-return-this-type": "warn",
-    "@typescript-eslint/prefer-string-starts-ends-with": "warn",
     "@typescript-eslint/prefer-ts-expect-error": "warn",
-    "@typescript-eslint/promise-function-async": "warn",
     "@typescript-eslint/require-await": "error",
     "@typescript-eslint/restrict-plus-operands": "error",
     "@typescript-eslint/restrict-template-expressions": "error",
