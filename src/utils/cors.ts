@@ -21,7 +21,7 @@ export default (origins: HeaderValue, options?: Options): MiddlewareFn => {
       // eslint-disable-next-line
       preflightHeaders.push(['Access-Control-Allow-Methods', '' + options.allowMethods]);
     if (options.maxAge != null)
-      // eslint-disable-next-line
+
       preflightHeaders.push(['Access-Control-Max-Age', '' + options.maxAge]);
 
     if (options.exposeHeaders != null)
@@ -38,7 +38,6 @@ export default (origins: HeaderValue, options?: Options): MiddlewareFn => {
     // Handle multiple origins
     if (Array.isArray(origins)) {
       // Skip when not needed
-      // eslint-disable-next-line
       return (next, c) => {
         const origin = c.req.headers.get('Origin');
         c.headers.push(['Access-Control-Allow-Origin', typeof origin === 'string' && origins.includes(origin) ? origin : origins[0]], ...headers);
@@ -53,7 +52,6 @@ export default (origins: HeaderValue, options?: Options): MiddlewareFn => {
 
   headers.push(['Access-Control-Allow-Origin', origins]);
 
-  // eslint-disable-next-line
   return (next, c) => {
     c.headers.push(...headers);
 
