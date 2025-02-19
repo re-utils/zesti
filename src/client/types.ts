@@ -39,4 +39,4 @@ export type InferRoutes<T extends HandlerData[], State, ErrorResponse extends Re
   ? InferHandlerRPC<A, State, ErrorResponse, Prefix> | InferRoutes<Rest, State, ErrorResponse, Prefix>
   : never;
 
-export type Client<T extends AnyRouter> = UnionToIntersection<InferClient<T, never, ''>>;
+export type Client<T extends AnyRouter> = UnionToIntersection<InferClient<T, never, '/'>>;
