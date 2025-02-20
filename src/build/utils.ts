@@ -16,3 +16,5 @@ export const handleErrors = (errSet: ErrorSet, fallback: ErrorHandlerData[1], er
       // @ts-expect-error Error is static here
       : fn(c);
 };
+
+export const joinPath = (prefix: string, route: string): string => prefix === '' ? route : route === '/' ? prefix : prefix + route;

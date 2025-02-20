@@ -7,7 +7,7 @@ import type { Context, HandlerData } from '../types/route';
 import type { ErrorHandlerData } from '../error';
 
 import context from './context';
-import { handleErrors, type ErrorSet } from './utils';
+import { handleErrors, joinPath, type ErrorSet } from './utils';
 
 type BaseRouter = [staticRoutes: string[], val: AnyFn[], dynamicRoutes: string[], val: AnyFn[]];
 type RouteTree = [Record<string, BaseRouter>, BaseRouter | null];
@@ -91,7 +91,7 @@ export const build = (router: AnyRouter, state: State, prefix: string, errSet: E
     tmp = x[3] ? 2 : 0;
 
     // Push the path and the handler
-    targetRouter[tmp].push(prefix + x[1]);
+    targetRouter[tmp].push(joinPath(prefix, x[1]));
     (targetRouter[tmp + 1] as AnyFn[]).push((...args: [any, any]) => {
       let idx = 0;
       const c: Context = args[args.length - 1];

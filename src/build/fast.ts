@@ -8,7 +8,7 @@ import type { Context, HandlerData } from '../types/route';
 import type { ErrorHandlerData } from '../error';
 
 import context from './context';
-import { handleErrors, type ErrorSet } from './utils';
+import { handleErrors, joinPath, type ErrorSet } from './utils';
 
 type RouteTree = [Record<string, BaseRouter<AnyFn>>, BaseRouter<AnyFn> | null];
 type State = [routesTree: RouteTree, cbs: AnyMiddlewareFn[], errs: ErrorHandlerData[], allErrFn: ErrorHandlerData[1]];
@@ -89,7 +89,7 @@ export const build = (router: AnyRouter, state: State, prefix: string, errSet: E
         // @ts-expect-error Hey
         : tree[0][x[0]] ??= createRouter(),
 
-      prefix + x[1],
+      joinPath(prefix, x[1]),
       mds.length === 0
         ? f
         : x[3]
