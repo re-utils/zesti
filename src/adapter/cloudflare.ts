@@ -15,7 +15,7 @@ export interface BaseContext extends Context, InitState { }
 
 export default router as () => Router<InitState>;
 
-type FetchArgs = [InitState['env'], InitState['ctx']];
+type FetchArgs = [env: InitState['env'], ctx: InitState['ctx']];
 export interface LazyBuildResult {
   fetch: FetchFn<FetchArgs>;
 }
@@ -29,7 +29,7 @@ export const buildAdapter: BuildAdapter<InitState, FetchArgs> = (r, e, c) => {
   return k;
 };
 
-export const lazyBuild = <T extends ExportedHandler<InitState['env']>>(fn: () => ReturnType<BuildFn>, o: T = {} as T): LazyBuildResult & T => {
-  (o as any as LazyBuildResult).fetch = (r, e, c) => ((o as any as LazyBuildResult).fetch = fn())(r, e, c);
+export const lazyBuild = <T extends ExportedHandler<InitState['env']>>(fn: (...args: FetchArgs) => ReturnType<BuildFn>, o: T = {} as T): LazyBuildResult & T => {
+  (o as any as LazyBuildResult).fetch = (r, e, c) => ((o as any as LazyBuildResult).fetch = fn(e, c))(r, e, c);
   return o as any as LazyBuildResult & T;
 };
