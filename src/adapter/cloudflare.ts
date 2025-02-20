@@ -11,6 +11,7 @@ export interface InitState {
   env: Env;
   ctx: ExecutionContext;
 }
+export interface BaseContext extends Context, InitState { }
 
 export default router as () => Router<InitState>;
 
@@ -20,7 +21,7 @@ export interface LazyBuildResult {
 }
 
 export const buildAdapter: BuildAdapter<InitState, FetchArgs> = (r, e, c) => {
-  const k: Context & InitState = Object.create(context);
+  const k: BaseContext = Object.create(context);
   k.headers = [];
   k.req = r;
   k.env = e;
@@ -29,7 +30,6 @@ export const buildAdapter: BuildAdapter<InitState, FetchArgs> = (r, e, c) => {
 };
 
 export const lazyBuild = <T extends ExportedHandler<InitState['env']>>(fn: () => ReturnType<BuildFn>, o: T = {} as T): LazyBuildResult & T => {
-  // eslint-disable-next-line
   (o as any as LazyBuildResult).fetch = (r, e, c) => ((o as any as LazyBuildResult).fetch = fn())(r, e, c);
   return o as any as LazyBuildResult & T;
 };

@@ -10,6 +10,7 @@ import context from '../build/context';
 export interface InitState {
   server: Server;
 }
+export interface BaseContext extends Context, InitState { }
 
 export default router as () => Router<InitState>;
 export const buildAdapter: BuildAdapter<InitState, [server: InitState['server']]> = (r, s) => {

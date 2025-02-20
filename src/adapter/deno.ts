@@ -11,6 +11,7 @@ export interface InitState {
     completed: Promise<void>
   };
 }
+export interface BaseContext extends Context, InitState { }
 
 export default router as () => Router<InitState>;
 export const buildAdapter: BuildAdapter<InitState, [info: InitState['info']]> = (r, i) => {
