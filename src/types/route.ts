@@ -23,7 +23,7 @@ export interface Context {
   html: Context['send'];
 }
 
-export type Handler<State, Args extends any[] = []> = (...args: [...Args, Context & State]) => MaybePromise<Response | null | undefined>;
+export type Handler<State, Args extends any[] = []> = (...args: [...Args, Context & State]) => MaybePromise<Response | JSONResponse<any, -1> | null | undefined>;
 export type AnyHandler = Handler<any, [any]> | Handler<any>;
 
 // null is for any handler
