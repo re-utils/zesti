@@ -82,11 +82,8 @@ export const build = (router: AnyRouter, state: State, prefix: string, errSet: E
 
     const f = x[2];
     insertItem(
-      // @ts-expect-error Hey
       x[0] === null
-        // @ts-expect-error Hey
         ? tree[1] ??= createRouter()
-        // @ts-expect-error Hey
         : tree[0][x[0]] ??= createRouter(),
 
       joinPath(prefix, x[1]),

@@ -1,6 +1,6 @@
 {
   "name": "zesti",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "description": "A small and fast Edge framework",
   "keywords": [],
   "license": "MIT",
@@ -36,6 +36,6 @@
     "uglify-js": "^3.19.3"
   },
   "dependencies": {
-    "@mapl/router": "0.3.5"
+    "@mapl/router": "0.4.2"
   }
 }
